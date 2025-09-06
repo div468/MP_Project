@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dragonstats.data.TorneoData
 import com.example.dragonstats.R
+import com.example.dragonstats.data.Grupo
 import com.example.dragonstats.ui.adapters.GruposAdapter
 
 class FaseGruposFragment : Fragment() {
@@ -33,7 +34,13 @@ class FaseGruposFragment : Fragment() {
 
     private fun setupRecyclerView(view: View) {
         recyclerView = view.findViewById(R.id.recyclerViewGrupos)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.layoutManager = layoutManager
+
+        // Mejorar el rendimiento del RecyclerView
+        recyclerView.setHasFixedSize(true)
+        recyclerView.itemAnimator = null // Desactivar animaciones para mejor rendimiento
 
         val grupos = TorneoData.obtenerGrupos()
         adapter = GruposAdapter(grupos)
@@ -41,7 +48,14 @@ class FaseGruposFragment : Fragment() {
     }
 
     private fun loadData() {
-        // Los datos ya se cargan en setupRecyclerView
-        // Aquí podriasmos conectar una API
+        // Simular carga de datos
+        // En una implementación real, aquí cargarías datos desde una API
+        // y actualizarías el adapter
+    }
+
+    // Método para refrescar datos
+    fun refreshData() {
+        val nuevosGrupos = TorneoData.obtenerGrupos()
+        adapter.updateData(nuevosGrupos)
     }
 }

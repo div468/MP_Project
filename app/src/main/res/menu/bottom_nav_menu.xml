@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/faseGruposFragment"
+        android:id="@+id/calendarioFragment"
         android:icon="@drawable/ic_calendar"
+        android:title="Calendario" />
+    <item
+        android:id="@+id/gruposFragment"
+        android:icon="@drawable/ic_schedule"
         android:title="Grupos" />
 
     <item
@@ -10,8 +14,5 @@
         android:icon="@drawable/ic_teams"
         android:title="Equipos" />
 
-    <item
-        android:id="@+id/calendarioFragment"
-        android:icon="@drawable/ic_schedule"
-        android:title="Calendario" />
+
 </menu>

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dragonstats.R
 import com.example.dragonstats.data.Grupo
 
-class GruposAdapter(private val grupos: List<Grupo>) : RecyclerView.Adapter<GruposAdapter.GrupoViewHolder>() {
+class GruposAdapter(private var grupos: List<Grupo>) : RecyclerView.Adapter<GruposAdapter.GrupoViewHolder>() {
 
     class GrupoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nombreGrupo: TextView = view.findViewById(R.id.tvNombreGrupo)
@@ -29,9 +29,19 @@ class GruposAdapter(private val grupos: List<Grupo>) : RecyclerView.Adapter<Grup
 
         // Configurar RecyclerView para equipos
         val equiposAdapter = EquiposAdapter(grupo.equipos)
-        holder.recyclerViewEquipos.layoutManager = LinearLayoutManager(holder.itemView.context)
-        holder.recyclerViewEquipos.adapter = equiposAdapter
+        holder.recyclerViewEquipos.apply {
+            layoutManager = LinearLayoutManager(holder.itemView.context)
+            adapter = equiposAdapter
+            // Desactivar scroll anidado para mejor rendimiento
+            isNestedScrollingEnabled = false
+        }
     }
 
     override fun getItemCount() = grupos.size
+
+    // Método para actualizar datos
+    fun updateData(nuevosGrupos: List<Grupo>) {
+        grupos = nuevosGrupos
+        notifyDataSetChanged()
+    }
 }

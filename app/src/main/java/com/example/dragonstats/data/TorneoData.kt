@@ -26,8 +26,12 @@ object TorneoData {
             Grupo(
                 "Grupo C",
                 listOf(
-                    Equipo(11, "Equipo 1", 1, 1, 1, "C"),
-                    Equipo(12, "Equipo 2", 2, 2, 2, "C")
+                    Equipo(11, "Equipo 1", 1, 1, 1, "B"),
+                    Equipo(12, "Equipo 2", 2, 2, 2, "B"),
+                    Equipo(13, "Equipo 3", 3, 3, 3, "B"),
+                    Equipo(14, "Equipo 4", 4, 4, 4, "B"),
+                    Equipo(15, "Equipo 5", 5, 5, 5, "B")
+
                 )
             )
         )
