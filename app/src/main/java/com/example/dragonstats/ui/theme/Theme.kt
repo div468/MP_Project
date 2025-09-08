@@ -16,11 +16,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+//Colores principales
 val GreenPrimary = Color(0xFF4CAF50)
 val GreenDark = Color(0xFF2E7D32)
 val BlackBackground = Color(0xFF000000)
 val DarkGray = Color(0xFF1A1A1A)
 
+//Planificacion cambio de modos
+
+//Modo oscuro
 private val DarkColorScheme = darkColorScheme(
     primary = GreenPrimary,
     secondary = GreenDark,
@@ -34,6 +38,8 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = Color.White,
 )
 
+
+//Modo Claro
 private val LightColorScheme = lightColorScheme(
     primary = GreenPrimary,
     secondary = GreenDark,
@@ -50,8 +56,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun DragonStatsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false, // Deshabilitado para mantener nuestro esquema de color
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
