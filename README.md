@@ -40,7 +40,7 @@ app/
 │       │           └── Type.kt                 ← Tipografía
 │       │
 │       └── res/
-│           ├── drawable/                        ← Recursos gráficos (mantenidos)
+│           ├── drawable/                        ← Recursos gráficos
 │           │   ├── ic_calendar.xml             ← Icono calendario
 │           │   ├── ic_teams.xml                ← Icono equipos
 │           │   ├── ic_schedule.xml             ← Icono grupos/horarios
