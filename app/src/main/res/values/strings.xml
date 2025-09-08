@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">DragonStats</string>
+
+    <!-- Navigation -->
+    <string name="nav_calendario">Calendario</string>
+    <string name="nav_grupos">Grupos</string>
+    <string name="nav_equipos">Equipos</string>
+
+    <!-- Screens -->
+    <string name="screen_calendario">Pantalla de Calendario</string>
+    <string name="screen_equipos">Pantalla de Equipos</string>
+    <string name="screen_bracket_stage">Pantalla de Bracket Stage</string>
+    <string name="development_placeholder">(En desarrollo)</string>
+
+    <!-- Tabs -->
+    <string name="tab_fase_grupos">Fase de grupos</string>
+    <string name="tab_bracket_stage">Bracket Stage</string>
+
+    <!-- Table headers -->
+    <string name="header_partidos">P</string>
+    <string name="header_gol_diferencia">GD</string>
+    <string name="header_puntos">Pts.</string>
 </resources>
