@@ -5,57 +5,50 @@
 ### Mapa
 ```
 app/
-├── build.gradle                                 ← Dependencias
+├── build.gradle.kts                             ← Dependencias
 ├── src/
 │   └── main/
-│       ├── java/com/example/torneofutbol/
-│       │   ├── MainActivity.kt
-│       │   ├── data/                            ← Clases y datos estaticos
-│       │   │   ├── Equipo.kt
-│       │   │   ├── Grupo.kt
-│       │   │   ├── Jugador.kt
-│       │   │   ├── Partido.kt
-│       │   │   └── TorneoData.kt
+│       ├── java/com/example/dragonstats/
+│       │   ├── MainActivity.kt                  ← Activity principal (ComponentActivity + Compose)
+│       │   │
+│       │   ├── data/                            ← Clases y datos estáticos
+│       │   │   ├── Equipo.kt                   ← Modelo de equipo
+│       │   │   ├── Grupo.kt                    ← Modelo de grupo
+│       │   │   ├── Jugador.kt                  ← Modelo de jugador
+│       │   │   ├── Partido.kt                  ← Modelo de partido
+│       │   │   └── TorneoData.kt               ← Datos del torneo
+│       │   │
 │       │   └── ui/
-│       │      ├── fragments/                    ← Pantallas
-│       │      │   ├── FaseGruposFragment.kt
-│       │      │   ├── BracketStageFragment.kt
-│       │      │   ├── EquiposFragment.kt
-│       │      │   ├── CalendarioFragment.kt
-│       │      │   ├── JugadoresFragment.kt
-│       │      │   └── PartidosFragment.kt
-│       │      └── adapters/                     ← puente entre los datos y la interfaz visual
-│       │         ├── GruposAdapter.kt
-│       │         ├── EquiposAdapter.kt
-│       │         ├── JugadoresAdapter.kt
-│       │         ├── PartidosAdapter.kt
-│       │         └── BracketAdapter.kt
-│       │   
+│       │       ├── components/                  ← Componentes reutilizables
+│       │       │   └── BottomNavigationBar.kt  ← Navegación inferior en Compose
+│       │       │
+│       │       ├── navigation/                  ← Sistema de navegación
+│       │       │   └── AppNavHost.kt           ← Configuración Navigation Compose
+│       │       │
+│       │       ├── screens/                     ← Pantallas principales
+│       │       │   ├── CalendarioScreen.kt     ← Pantalla calendario
+│       │       │   ├── EquiposScreen.kt        ← Pantalla equipos
+│       │       │   ├── GruposScreen.kt         ← Pantalla grupos (con tabs)
+│       │       │   │
+│       │       │   └── tabs/                   ← Tabs de la pantalla grupos
+│       │       │       ├── FaseGruposTab.kt    ← Tab fase de grupos
+│       │       │       └── BracketStageTab.kt  ← Tab bracket stage
+│       │       │
+│       │       └── theme/                       ← Temas y estilos
+│       │           ├── Color.kt                ← Colores
+│       │           ├── Theme.kt                ← Tema Material3 + DragonStats
+│       │           └── Type.kt                 ← Tipografía
+│       │
 │       └── res/
-│           ├── layout/                          ← cómo se ven las pantallas
-│           │   ├── activity_main.xml
-│           │   ├── fragment_fase_grupos.xml
-│           │   ├── fragment_grupos_container.xml
-│           │   ├── fragment_placeholder.xml
-│           │   ├── item_grupo.xml
-│           │   └── item_equipo.xml
-│           ├── navigation/
-│           │   └── nav_graph.xml                ← Navegación
-│           ├── menu/
-│           │   └── bottom_nav_menu.xml          ← Menú navegación inferior
-│           ├── drawable/                        ← Refursos graficos
-│           │   ├── ic_calendar.xml
-│           │   ├── ic_teams.xml
-│           │   ├── ic_schedule.xml
-│           │   ├── ic_equipo_default.xml
-│           │   ├── tab_selected_background.xml
-│           │   └── tab_unselected_background.xml
-│           ├── values/                          ← Colores, textos, temas del programa general
-│           │   ├── colors.xml ← Colores
-│           │   ├── strings.xml ← Textos
-│           │   └── themes.xml ← Temas
-│           └── color/
-│               └── bottom_nav_color_selector.xml ← Selector colores (navegacion inferior)
+│           ├── drawable/                        ← Recursos gráficos (mantenidos)
+│           │   ├── ic_calendar.xml             ← Icono calendario
+│           │   ├── ic_teams.xml                ← Icono equipos
+│           │   ├── ic_schedule.xml             ← Icono grupos/horarios
+│           │   └── ic_equipo_default.xml       ← Icono por defecto equipos
+│           │
+│           └── values/                          ← Valores de configuración
+│               ├── strings.xml                 ← Textos de la aplicación
+│               └── themes.xml                  
 ```
 
 ### 📱 Desarrollo - Jetpack Compose
