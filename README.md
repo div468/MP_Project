@@ -58,61 +58,44 @@ app/
 │               └── bottom_nav_color_selector.xml ← Selector colores (navegacion inferior)
 ```
 
-### Desarrollo
+### 📱 Desarrollo - Jetpack Compose
+#### 🎯 Código Kotlin (java/com/example/dragonstats/)
+##### MainActivity.kt
 
-#### 📁 Código Kotlin (java/com/example/torneofutbol/):
+* Compose Activity: Extiende ComponentActivity
+* Setup UI: Usa setContent para configurar interfaz
+* Theme Integration: Integra DragonStatsTheme automáticamente
 
-* MainActivity.kt - Actividad principal
-* data/ - Modelos de datos y clases de datos
-* ui/fragments/ - Todos los fragments (pantallas)
-* ui/adapters/ - Adaptadores para RecyclerViews
+#### data/
 
-#### 📁 Layouts (res/layout/):
+* Equipo.kt: Modelo de datos del equipo
+* Grupo.kt: Modelo de datos del grupo
+* TorneoData.kt: Datos estáticos con equipos realistas y ordenamiento
 
-* activity_main.xml - Layout principal con bottom navigation
-* fragment_*.xml - Layout de cada fragment/pantalla
-* item_*.xml - Layouts para items de RecyclerView
+#### ui/components/
 
-#### 📁 Navegación (res/navigation/):
+* BottomNavigationBar.kt: Navegación inferior completamente en Compose
+* Componentes reutilizables para toda la app
 
-* nav_graph.xml - Grafo de navegación entre fragments
+#### ui/navigation/
 
-#### 📁 Menús (res/menu/):
+* AppNavHost.kt: Configuración de navegación con Navigation Compose
+* Manejo de rutas y transiciones entre pantallas
 
-* bottom_nav_menu.xml - Menú de navegación inferior
+#### ui/screens/
 
-#### 📁 Drawables (res/drawable/):
+* CalendarioScreen.kt: Pantalla principal de calendario (placeholder)
+* EquiposScreen.kt: Pantalla de equipos (placeholder)
+* GruposScreen.kt: Pantalla de grupos con sistema de tabs
 
-* ic_*.xml - Iconos vectoriales
-* tab_*.xml - Backgrounds para pestañas superiores
+#### ui/screens/tabs/
 
-#### 📁 Valores (res/values/):
+* FaseGruposTab.kt: Tabla completa de grupos con: Cards por grupo ordenadas por puntos Colores por posición (🟢 clasifican, 🟠 peligro, 🔴 eliminados)
 
-* colors.xml - Definición de colores
-* strings.xml - Textos de la aplicación
-* themes.xml - Temas de la aplicación
+* BracketStageTab.kt: Tab para fase de eliminatorias (placeholder)
 
-#### 📁 Selectores de Color (res/color/):
+#### ui/theme/
 
-* bottom_nav_color_selector.xml - Colores para navegación
-
-#### 📁 Dependencias:
-
-* build.gradle (Module: app) - Todas las dependencias de librerías
-
-### Descripcion
-#### Adapter
-Un Adapter para RecyclerView es una clase que actúa como intermediario entre tus datos y la vista visual. Es como un "traductor" que convierte información en elementos visuales.
-##### ¿Qué hace exactamente?
-Imagina que tienes una lista de 1000 equipos de fútbol, pero tu pantalla solo puede mostrar 10 a la vez. El adapter:
-
-* Toma tus datos (lista de equipos)
-* Los convierte en vistas visuales (tarjetas con nombre, logo, etc.)
-* Optimiza la memoria reutilizando vistas que salen de pantalla
-* Maneja el scroll mostrando nuevos elementos según necesites
-
-#### Layout
-Un Layout es un archivo XML que define cómo se organizan y ven los elementos en una pantalla. Es como el "plano arquitectónico" de tu interfaz de usuario.
-
-#### Drawable
-Un Drawable es cualquier recurso gráfico que se puede "dibujar" en la pantalla. Son como los "elementos visuales" de tu app: íconos, formas, colores, efectos, etc.
+* Theme.kt: Temas personalizados
+* Color.kt: Definiciones de colores
+* Type.kt: Configuración de tipografía
