@@ -120,19 +120,15 @@ fun MatchDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "🕐",
-                            fontSize = 48.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Text(
-                            text = if (encuentro.hora != null) "Próximo partido" else "Partido pendiente",
+                            text = if (encuentro.hora != null || encuentro.resultado != null) "Próximo partido" else "Partido pendiente",
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium
                         )
-                        if (encuentro.hora != null) {
+                        if (encuentro.hora != null || encuentro.resultado != null) {
+                            val horaDisplay = encuentro.hora ?: encuentro.resultado ?: ""
                             Text(
-                                text = "${encuentro.fecha} - ${encuentro.hora}",
+                                text = "${encuentro.fecha} - $horaDisplay",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
@@ -158,8 +154,10 @@ private fun MatchHeader(encuentro: com.example.dragonstats.data.Encuentro) {
                 fontWeight = FontWeight.Bold
             )
         } else {
+            // Mostrar hora del campo `hora` o `resultado`, sino "--:--"
+            val horaDisplay = encuentro.hora ?: encuentro.resultado ?: "--:--"
             Text(
-                text = encuentro.hora ?: "--:--",
+                text = horaDisplay,
                 color = Color.White,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
