@@ -6,7 +6,7 @@ object TorneoData {
             Grupo(
                 "Grupo A",
                 listOf(
-                    Equipo(1, "Dragons FC", 3, 5, 9, "A"),
+                    Equipo(1, "Dragons FC", 3, 5, 9, "A",),
                     Equipo(2, "Phoenix United", 3, 2, 7, "A"),
                     Equipo(3, "Thunder Bolts", 3, -1, 4, "A"),
                     Equipo(4, "Storm Riders", 3, -3, 3, "A"),
