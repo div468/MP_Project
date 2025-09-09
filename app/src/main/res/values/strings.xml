@@ -20,4 +20,7 @@
     <string name="header_partidos">P</string>
     <string name="header_gol_diferencia">GD</string>
     <string name="header_puntos">Pts.</string>
+
+    <!-- CalendarScreen -->
+    <string name="calendario_screen_title">Próximos encuentros</string>
 </resources>
