@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,7 +24,7 @@ import com.example.dragonstats.data.CalendarioData
 import com.example.dragonstats.ui.navigation.Screen
 
 @Composable
-fun CalendarioScreen(navController: NavController) {
+fun CalendarioScreen(onPartidoClick: () -> Unit) {
     val encuentros = CalendarioData.obtenerEncuentros()
 
     Column(
@@ -33,7 +35,7 @@ fun CalendarioScreen(navController: NavController) {
     ) {
         // Header
         Text(
-            text = "Próximos encuentros",
+            text = stringResource(id = R.string.calendario_screen_title),
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -50,9 +52,7 @@ fun CalendarioScreen(navController: NavController) {
             items(encuentros) { jornada ->
                 JornadaCard(
                     jornada = jornada,
-                    onMatchClick = { matchId ->
-                        navController.navigate(Screen.MatchDetail.createRoute(matchId))
-                    }
+                    onPartidoClick = onPartidoClick
                 )
             }
         }
@@ -60,13 +60,10 @@ fun CalendarioScreen(navController: NavController) {
 }
 
 @Composable
-private fun JornadaCard(
-    jornada: CalendarioData.Jornada,
-    onMatchClick: (Int) -> Unit
-) {
+private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.dark_gray)),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -89,15 +86,14 @@ private fun JornadaCard(
                 jornada.encuentros.forEach { encuentro ->
                     EncuentroItem(
                         encuentro = encuentro,
-                        onClick = { onMatchClick(encuentro.id) }
+                        onPartidoClick = onPartidoClick
                     )
 
                     // Divisor entre encuentros (excepto el último)
                     if (encuentro != jornada.encuentros.last()) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 4.dp),
-                            thickness = 1.dp,
-                            color = Color(0xFF333333)
+                            thickness = 1.dp
                         )
                     }
                 }
@@ -107,15 +103,11 @@ private fun JornadaCard(
 }
 
 @Composable
-private fun EncuentroItem(
-    encuentro: Encuentro,
-    onClick: () -> Unit
-) {
+private fun EncuentroItem(encuentro: Encuentro, onPartidoClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = 8.dp),
+            .clickable { onPartidoClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -127,7 +119,7 @@ private fun EncuentroItem(
             Icon(
                 painter = painterResource(id = R.drawable.ic_equipo_default),
                 contentDescription = null,
-                tint = Color(0xFF4CAF50),
+                tint = colorResource(id = R.color.green_calendar),
                 modifier = Modifier.size(24.dp)
             )
 
@@ -195,7 +187,7 @@ private fun EncuentroItem(
             Icon(
                 painter = painterResource(id = R.drawable.ic_equipo_default),
                 contentDescription = null,
-                tint = Color(0xFF4CAF50),
+                tint = colorResource(id = R.color.green_calendar),
                 modifier = Modifier.size(24.dp)
             )
         }

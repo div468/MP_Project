@@ -7,10 +7,8 @@
     <string name="nav_equipos">Equipos</string>
 
     <!-- Screens -->
-    <string name="screen_calendario">Pantalla de Calendario</string>
-    <string name="screen_equipos">Pantalla de Equipos</string>
-    <string name="screen_bracket_stage">Pantalla de Bracket Stage</string>
-    <string name="development_placeholder">(En desarrollo)</string>
+    <string name="screen_calendario">Calendario</string>
+    <string name="screen_equipos">Equipos</string>
 
     <!-- Tabs -->
     <string name="tab_fase_grupos">Fase de grupos</string>
@@ -20,4 +18,26 @@
     <string name="header_partidos">P</string>
     <string name="header_gol_diferencia">GD</string>
     <string name="header_puntos">Pts.</string>
+
+    <!-- Bracket stage -->
+    <string name="header_phase1">Octavos de final</string>
+    <string name="header_phase2">Cuartos de final</string>
+    <string name="header_phase3">Semifinal</string>
+    <string name="header_phase4">FINAL</string>
+
+    <!-- CalendarScreen -->
+    <string name="calendario_screen_title">Próximos encuentros</string>
+
+    <!-- ListadoScreen -->
+    <string name="back_icon_description">Volver</string>
+    <string name="list_title">Listado de Jugadores</string>
+    <string name="logo_equipo">Logo del equipo</string>
+    <string name="ganados">Ganados: </string>
+    <string name="empatados"> Empatados: </string>
+    <string name="perdidos"> Perdidos: </string>
+    <string name="ptsTotal">Pts. Totales: </string>
+    <string name="jugador">Jugador</string>
+    <string name="goles">G</string>
+    <string name="asistencias">A</string>
+    <string name="posicion">P</string>
 </resources>
