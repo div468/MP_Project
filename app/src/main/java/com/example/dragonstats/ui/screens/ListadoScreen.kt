@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,25 +28,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.dragonstats.R
 import com.example.dragonstats.data.Equipo
 import com.example.dragonstats.data.Jugador
+import com.example.dragonstats.data.TorneoData
 
 @Composable
-fun ListadoScreen (e: Equipo){
-    var j = listOf(Jugador(1, "A", 4,5,"S",1))
+fun ListadoScreen (e: Int, navController: NavController){
+    val j = TorneoData.obtenerJugadores()
+    val eq = obtenerEquipoPorId(e)
     Box( //Contenedor de la vista
         modifier = Modifier.fillMaxSize()
-            .background(Color.Black),
-        contentAlignment = Alignment.Center
+            .background(Color.Black)
     ){
         Column(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Row( //Contenedor del botón de retroceso y título
@@ -56,27 +59,28 @@ fun ListadoScreen (e: Equipo){
 
             ){
                 IconButton(
-                    onClick = {},
+                    onClick = {navController.navigate("equipos")},
                     modifier = Modifier.height(18.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver"
                     )
-                    Text(
-                        text = "Listado de Jugadores",
-                        fontSize = 18.sp
-                    )
                 }
+                Text(
+                    text = "Listado de Jugadores",
+                    fontSize = 18.sp
+                )
             }
 
-            DatosEquipo(e)
+            DatosEquipo(eq)
 
             Box(//Contenedor con la tabla de los jugadores
                 modifier = Modifier.padding(horizontal = 5.dp)
-                    .padding(top = 10.dp)
-                    .fillMaxWidth()
-                    .height(150.dp).background(Color.Gray),
+                    .padding(vertical = 30.dp, horizontal = 15.dp)
+                    .fillMaxWidth().weight(1f)
+                    .height(150.dp).background(Color(0xFF1A1A1A),RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
             ){
                 TablaJugadores(j)
             }
@@ -85,43 +89,55 @@ fun ListadoScreen (e: Equipo){
 }
 
 @Composable
-fun DatosEquipo(equipo: Equipo){
+fun DatosEquipo(equipo: Equipo?){
     var isLiked by remember { mutableStateOf(false) }
     Box( //Contenedor con los datos del equipo
-        modifier = Modifier.padding(horizontal = 5.dp)
-            .padding(top = 10.dp)
+        modifier = Modifier.padding(horizontal = 15.dp)
+            .padding(top = 40.dp)
             .fillMaxWidth()
-            .height(150.dp).background(Color.Gray),
+            .height(150.dp).background(Color(0xFF1A1A1A),RoundedCornerShape(12.dp))
     ){
         Row(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(top = 20.dp)
         ){
             Image( //Logo/Escudo del equipo
                 painter = painterResource(id = R.drawable.ic_equipo_default),
                 contentDescription = "Logo del equipo",
                 modifier = Modifier.size(100.dp)
             )
-            Column{ //Datos generales del equipo
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center
+            ){ //Datos generales del equipo
                 Text(
-                    text = equipo.nombre,
+                    text = equipo!!.nombre,
                     fontSize = 25.sp
                 )
                 Text(
                     text = "Ganados: " + 5 +
-                            "Empatados: " + 0 +
-                            "Perdidos: " + 2
+                            " Empatados: " + 0 +
+                            " Perdidos: " + 2
                 )
-                Text(
-                    text = "Pts. Totales: " + equipo.puntos
-                )
-                IconButton(
-                    onClick = { isLiked = !isLiked }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.Favorite,
-                        contentDescription = if (isLiked) "Quitar like" else "Dar like",
-                        tint = if (isLiked) Color(0xFF4CAF50) else Color.Gray
+                    Text(
+                        text = "Pts. Totales: " + equipo.puntos
                     )
+                    IconButton(
+                        onClick = { isLiked = !isLiked }
+                    ) {
+                        Icon(
+                            painter = if(isLiked)
+                                painterResource(R.drawable.ic_favoritefilled)
+                            else
+                                painterResource(R.drawable.ic_favorite),
+                            contentDescription = null,
+                            tint = if(isLiked) Color(0xFF4CAF50) else Color.Gray,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
 
@@ -174,12 +190,7 @@ fun FilaJugador(j:Jugador){
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 12.dp)
-            .background(
-                if (j.id % 2 == 0) Color.DarkGray
-                else Color.Gray
-            )
-            .padding(8.dp),
+            .padding(vertical = 12.dp, horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -220,9 +231,22 @@ fun TablaJugadores(jugadores: List<Jugador>){
     Column(modifier = Modifier.fillMaxWidth()){
         Encabezados()
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(jugadores){jugador ->
+            itemsIndexed(jugadores){ index, jugador ->
                 FilaJugador(jugador)
+                if (index != jugadores.size - 1) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFF333333)
+                    )
+                }
             }
         }
     }
+}
+
+fun obtenerEquipoPorId(id: Int): Equipo? {
+    return TorneoData.obtenerGrupos()
+        .flatMap { it.equipos } // Aplanamos todas las listas de equipos
+        .firstOrNull { it.id == id } // Buscamos por ID
 }

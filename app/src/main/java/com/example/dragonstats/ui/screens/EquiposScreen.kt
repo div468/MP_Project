@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -36,9 +39,11 @@ import com.example.dragonstats.R
 import com.example.dragonstats.data.Equipo
 import com.example.dragonstats.data.TorneoData
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
+import com.example.dragonstats.ui.navigation.AppNavHost
 
 @Composable
-fun EquiposScreen() {
+fun EquiposScreen(navController: NavController) {
     val equipos = TorneoData.obtenerEquiposOrdenados()
     var equiposFavoritos by remember { mutableStateOf(setOf<String>()) }
 
@@ -74,6 +79,9 @@ fun EquiposScreen() {
                         }else {
                             equiposFavoritos - equipo.nombre
                         }
+                    },
+                    onVerJugadores = {
+                        navController.navigate("listadoJ/${equipo.id}")
                     }
                 )
             }
@@ -82,7 +90,7 @@ fun EquiposScreen() {
 }
 
 @Composable
-private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Boolean) -> Unit){
+private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Boolean) -> Unit, onVerJugadores:()->Unit){
     Card(
         modifier = Modifier.fillMaxSize(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -128,12 +136,22 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = "Ver jugadores",
-                        color = Color(0xFF4CAF50),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Button(
+                        onClick = onVerJugadores,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.height(32.dp)
+                    ) {
+                        Text(
+                            text = "Ver jugadores",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 

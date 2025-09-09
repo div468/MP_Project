@@ -3,16 +3,20 @@ package com.example.dragonstats.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.dragonstats.ui.screens.CalendarioScreen
 import com.example.dragonstats.ui.screens.EquiposScreen
 import com.example.dragonstats.ui.screens.GruposScreen
+import com.example.dragonstats.ui.screens.ListadoScreen
 
 sealed class Screen(val route: String, val title: String) {
     object Calendario : Screen("calendario", "Calendario")
     object Grupos : Screen("grupos", "Grupos")
     object Equipos : Screen("equipos", "Equipos")
+    object ListadoJ: Screen("listadoJ/{equipoID}", "Listado Jugadores")
 }
 
 @Composable
@@ -34,7 +38,12 @@ fun AppNavHost(
         }
 
         composable(Screen.Equipos.route) {
-            EquiposScreen()
+            EquiposScreen(navController)
+        }
+
+        composable(Screen.ListadoJ.route, listOf(navArgument("equipoID") { type = NavType.IntType })){backStackEntry ->
+            val equipoId = backStackEntry.arguments?.getInt("equipoID") ?: 0
+            ListadoScreen(equipoId,navController)
         }
     }
 }
