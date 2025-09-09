@@ -17,7 +17,7 @@ sealed class Screen(val route: String, val title: String) {
     object Calendario : Screen("calendario", "Calendario")
     object Grupos : Screen("grupos", "Grupos")
     object Equipos : Screen("equipos", "Equipos")
-    object PartidoDetails : Screen("partido_details", "Partido Details")
+    object PartidoDetails : Screen("partido_details/{matchId}", "Partido Details")
     object ListadoJ: Screen("listadoJ/{equipoID}", "Listado Jugadores")
 }
 
@@ -32,8 +32,8 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable(Screen.Calendario.route) {
-            CalendarioScreen(onPartidoClick = {
-                navController.navigate(Screen.PartidoDetails.route)
+            CalendarioScreen(onPartidoClick = { matchId ->
+                navController.navigate("partido_details/$matchId")
             })
         }
 
@@ -50,12 +50,19 @@ fun AppNavHost(
             ListadoScreen(equipoId,navController)
         }
 
-        composable(Screen.PartidoDetails.route) {
-            PartidoDetailsScreen(onBackClick = {
-                navController.navigate(Screen.Calendario.route) {
-                    popUpTo(Screen.Calendario.route) { inclusive = true }
-                }
-            })
+        composable(
+            route = "partido_details/{matchId}",
+            arguments = listOf(navArgument("matchId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val matchId = backStackEntry.arguments?.getInt("matchId") ?: 1
+            PartidoDetailsScreen(
+                onBackClick = {
+                    navController.navigate(Screen.Calendario.route) {
+                        popUpTo(Screen.Calendario.route) { inclusive = true }
+                    }
+                },
+                matchId = matchId
+            )
         }
     }
 }

@@ -7,5 +7,11 @@ data class Encuentro(
     val fecha: String,
     val hora: String? = null,
     val resultado: String? = null,
-    val jornada: Int
-)
+    val jornada: Int,
+    val golesEquipo1: Int? = null,
+    val golesEquipo2: Int? = null,
+    val eventos: List<PlayerEvent> = emptyList()
+) {
+    val tieneResultado: Boolean
+        get() = golesEquipo1 != null && golesEquipo2 != null
+}

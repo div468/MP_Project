@@ -17,12 +17,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.dragonstats.R
 import com.example.dragonstats.data.Encuentro
 import com.example.dragonstats.data.CalendarioData
+import com.example.dragonstats.ui.navigation.Screen
 
 @Composable
-fun CalendarioScreen(onPartidoClick: () -> Unit) {
+fun CalendarioScreen(onPartidoClick: (Int) -> Unit) {
     val encuentros = CalendarioData.obtenerEncuentros()
 
     Column(
@@ -58,7 +60,7 @@ fun CalendarioScreen(onPartidoClick: () -> Unit) {
 }
 
 @Composable
-private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> Unit) {
+private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: (Int) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.dark_gray)),
@@ -84,7 +86,7 @@ private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> U
                 jornada.encuentros.forEach { encuentro ->
                     EncuentroItem(
                         encuentro = encuentro,
-                        onPartidoClick = onPartidoClick
+                        onPartidoClick = { onPartidoClick(encuentro.id) }
                     )
 
                     // Divisor entre encuentros (excepto el último)
@@ -131,23 +133,40 @@ private fun EncuentroItem(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             )
         }
 
-        // Información central (hora/resultado y fecha)
+        // Información central (resultado si está jugado, sino hora/fecha)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = encuentro.hora ?: encuentro.resultado ?: "--",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = encuentro.fecha,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
+            // Mostrar resultado si el partido ya se jugó
+            if (encuentro.tieneResultado) {
+                Text(
+                    text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Final",
+                    color = Color(0xFF4CAF50),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            } else {
+                // Mostrar hora si está programado, sino mostrar "--"
+                val horaDisplay = encuentro.hora ?: encuentro.resultado ?: "--:--"
+                Text(
+                    text = horaDisplay,
+                    color = if (horaDisplay != "--:--") Color.White else Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = encuentro.fecha,
+                    color = Color.Gray,
+                    fontSize = 12.sp
+                )
+            }
         }
 
         // Equipo 2
