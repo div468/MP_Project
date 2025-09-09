@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +41,7 @@ import com.example.dragonstats.data.Jugador
 
 @Composable
 fun ListadoScreen (e: Equipo){
+    var j = listOf(Jugador(1, "A", 4,5,"S",1))
     Box( //Contenedor de la vista
         modifier = Modifier.fillMaxSize()
             .background(Color.Black),
@@ -74,7 +78,7 @@ fun ListadoScreen (e: Equipo){
                     .fillMaxWidth()
                     .height(150.dp).background(Color.Gray),
             ){
-
+                TablaJugadores(j)
             }
         }
     }
@@ -166,6 +170,59 @@ fun Encabezados(){
 }
 
 @Composable
-fun TablaJugadores(){
+fun FilaJugador(j:Jugador){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp, horizontal = 12.dp)
+            .background(
+                if (j.id % 2 == 0) Color.DarkGray
+                else Color.Gray
+            )
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Columna Jugador
+        Text(
+            text = j.nombre,
+            modifier = Modifier.weight(2f),
+            textAlign = TextAlign.Start
+        )
 
+        // Columna Goles
+        Text(
+            text = j.goles.toString(),
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Columna Asistencias
+        Text(
+            text = j.asistencias.toString(),
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+
+        // Columna Posición
+        Text(
+            text = j.posicion,
+            modifier = Modifier.weight(1.5f),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+fun TablaJugadores(jugadores: List<Jugador>){
+    Column(modifier = Modifier.fillMaxWidth()){
+        Encabezados()
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            items(jugadores){jugador ->
+                FilaJugador(jugador)
+            }
+        }
+    }
 }
