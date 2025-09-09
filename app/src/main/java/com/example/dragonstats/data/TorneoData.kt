@@ -6,7 +6,7 @@ object TorneoData {
             Grupo(
                 "Grupo A",
                 listOf(
-                    Equipo(1, "Dragons FC", 3, 5, 9, "A"),
+                    Equipo(1, "Dragons FC", 3, 5, 9, "A",),
                     Equipo(2, "Phoenix United", 3, 2, 7, "A"),
                     Equipo(3, "Thunder Bolts", 3, -1, 4, "A"),
                     Equipo(4, "Storm Riders", 3, -3, 3, "A"),
@@ -47,4 +47,14 @@ object TorneoData {
             )
         }
     }
+
+    //Funcion para obtener lista de equipos ordenados por puntos y diferencia de goles
+    fun obtenerEquiposOrdenados(): List<Equipo>{
+        return obtenerGrupos().flatMap {it.equipos}
+            .sortedWith(
+            compareByDescending<Equipo>{it.puntos}
+                .thenByDescending {it.golDiferencia}
+        )
+    }
+
 }
