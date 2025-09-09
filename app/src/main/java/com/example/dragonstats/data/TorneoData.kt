@@ -47,4 +47,14 @@ object TorneoData {
             )
         }
     }
+
+    //Funcion para obtener lista de equipos ordenados por puntos y diferencia de goles
+    fun obtenerEquiposOrdenados(): List<Equipo>{
+        return obtenerGrupos().flatMap {it.equipos}
+            .sortedWith(
+            compareByDescending<Equipo>{it.puntos}
+                .thenByDescending {it.golDiferencia}
+        )
+    }
+
 }
