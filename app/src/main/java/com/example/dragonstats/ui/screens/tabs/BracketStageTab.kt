@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -154,33 +155,32 @@ fun BracketStageTab() {
     val quarterFinals = remember { createQuarterFinals() }
     val semiFinals = remember { createSemiFinals() }
     val finalMatch = remember { createFinal() }
-
     val topRounds = listOf(
         Round(
-            phase = "Octavos de Final",
+            phase = stringResource(id = R.string.header_phase1),
             matches = octavos.take(4),
         ),
         Round(
-            phase = "Cuartos de Final",
+            phase = stringResource(id = R.string.header_phase2),
             matches = quarterFinals.take(2),
         ),
         Round(
-            phase = "Semifinal",
+            phase = stringResource(id = R.string.header_phase3),
             matches = semiFinals.take(1),
         )
     )
 
     val bottomRounds = listOf(
         Round(
-            phase = "Semifinal",
+            phase = stringResource(id = R.string.header_phase3),
             matches = semiFinals.drop(1),
         ),
         Round(
-            phase = "Cuartos de Final",
+            phase = stringResource(id = R.string.header_phase2),
             matches = quarterFinals.drop(2),
         ),
         Round(
-            phase = "Octavos de Final",
+            phase = stringResource(id = R.string.header_phase1),
             matches = octavos.drop(4),
         )
     )
@@ -211,7 +211,7 @@ fun BracketStageTab() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "FINAL",
+            text = stringResource(id = R.string.header_phase4),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Black
         )
