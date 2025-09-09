@@ -10,12 +10,14 @@ import androidx.navigation.navArgument
 import com.example.dragonstats.ui.screens.CalendarioScreen
 import com.example.dragonstats.ui.screens.EquiposScreen
 import com.example.dragonstats.ui.screens.GruposScreen
+import com.example.dragonstats.ui.screens.PartidoDetailsScreen
 import com.example.dragonstats.ui.screens.ListadoScreen
 
 sealed class Screen(val route: String, val title: String) {
     object Calendario : Screen("calendario", "Calendario")
     object Grupos : Screen("grupos", "Grupos")
     object Equipos : Screen("equipos", "Equipos")
+    object PartidoDetails : Screen("partido_details", "Partido Details")
     object ListadoJ: Screen("listadoJ/{equipoID}", "Listado Jugadores")
 }
 
@@ -30,7 +32,9 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable(Screen.Calendario.route) {
-            CalendarioScreen()
+            CalendarioScreen(onPartidoClick = {
+                navController.navigate(Screen.PartidoDetails.route)
+            })
         }
 
         composable(Screen.Grupos.route) {
@@ -44,6 +48,14 @@ fun AppNavHost(
         composable(Screen.ListadoJ.route, listOf(navArgument("equipoID") { type = NavType.IntType })){backStackEntry ->
             val equipoId = backStackEntry.arguments?.getInt("equipoID") ?: 0
             ListadoScreen(equipoId,navController)
+        }
+
+        composable(Screen.PartidoDetails.route) {
+            PartidoDetailsScreen(onBackClick = {
+                navController.navigate(Screen.Calendario.route) {
+                    popUpTo(Screen.Calendario.route) { inclusive = true }
+                }
+            })
         }
     }
 }
