@@ -276,9 +276,8 @@ fun PreviewMatchCard() {
     )
 }
 
-// Function to create octavos (8 matches)
 private fun createOctavos(): List<Match> {
-    val teams = getTopTeamsFromGroups(16) // Get top 16 teams
+    val teams = getTopTeamsFromGroups(16)
 
     return if (teams.size >= 16) {
         listOf(
@@ -292,12 +291,10 @@ private fun createOctavos(): List<Match> {
             Match(teams[7], teams[8], "0 - 0")
         )
     } else {
-        // Fallback: create dummy matches if not enough teams
         createDummyMatches(8)
     }
 }
 
-// Function to create quarter finals (4 matches)
 private fun createQuarterFinals(): List<Match> {
     return listOf(
         Match(createDummyTeam("Ganador O1"), createDummyTeam("Ganador O2"), "0 - 0"),
@@ -307,7 +304,6 @@ private fun createQuarterFinals(): List<Match> {
     )
 }
 
-// Function to create semi finals (2 matches)
 private fun createSemiFinals(): List<Match> {
     return listOf(
         Match(createDummyTeam("Ganador QF1"), createDummyTeam("Ganador QF2"), "0 - 0"),
@@ -315,7 +311,6 @@ private fun createSemiFinals(): List<Match> {
     )
 }
 
-// Function to create final (1 match)
 private fun createFinal(): Match {
     return Match(
         createDummyTeam("Ganador SF1"),
@@ -324,18 +319,16 @@ private fun createFinal(): Match {
     )
 }
 
-// Helper function to get top teams from groups
 private fun getTopTeamsFromGroups(count: Int): List<Equipo> {
     return try {
         TorneoData.obtenerGruposOrdenados()
-            .flatMap { it.equipos.take(2) } // Top 2 from each group
-            .take(count) // Take only the number needed
+            .flatMap { it.equipos.take(2) }
+            .take(count)
     } catch (e: Exception) {
         emptyList()
     }
 }
 
-// Helper function to create dummy matches
 private fun createDummyMatches(count: Int): List<Match> {
     return List(count) { index ->
         Match(
@@ -346,7 +339,6 @@ private fun createDummyMatches(count: Int): List<Match> {
     }
 }
 
-// Helper function to create a dummy team
 private fun createDummyTeam(name: String): Equipo {
     return Equipo(
         id = 0,
