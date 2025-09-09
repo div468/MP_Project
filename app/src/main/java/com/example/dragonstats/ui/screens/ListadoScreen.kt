@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,7 @@ fun ListadoScreen (e: Int, navController: NavController){
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Row( //Contenedor del botón de retroceso y título
-                modifier = Modifier.fillMaxWidth().height(20.dp)
+                modifier = Modifier.fillMaxWidth().height(25.dp)
                     .background(Color.Transparent),
 
             ){
@@ -64,11 +65,11 @@ fun ListadoScreen (e: Int, navController: NavController){
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver"
+                        contentDescription = stringResource(R.string.back_icon_description)
                     )
                 }
                 Text(
-                    text = "Listado de Jugadores",
+                    text = stringResource(R.string.list_title),
                     fontSize = 18.sp
                 )
             }
@@ -102,7 +103,7 @@ fun DatosEquipo(equipo: Equipo?){
         ){
             Image( //Logo/Escudo del equipo
                 painter = painterResource(id = R.drawable.ic_equipo_default),
-                contentDescription = "Logo del equipo",
+                contentDescription = stringResource(R.string.logo_equipo),
                 modifier = Modifier.size(100.dp)
             )
             Column(
@@ -114,16 +115,16 @@ fun DatosEquipo(equipo: Equipo?){
                     fontSize = 25.sp
                 )
                 Text(
-                    text = "Ganados: " + 5 +
-                            " Empatados: " + 0 +
-                            " Perdidos: " + 2
+                    text = stringResource(R.string.ganados)+ " " + 5 +
+                            " " + stringResource(R.string.empatados) + " " + 0 +
+                            " " + stringResource(R.string.perdidos) + " " + 2
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Pts. Totales: " + equipo.puntos
+                        text = stringResource(R.string.ptsTotal) + " " + equipo.puntos
                     )
                     IconButton(
                         onClick = { isLiked = !isLiked }
@@ -155,28 +156,28 @@ fun Encabezados(){
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(
-            text = "Jugador",
+            text = stringResource(R.string.jugador),
             color = Color.White,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(2f),
             textAlign = TextAlign.Start
         )
         Text(
-            text = "G", //Goles
+            text = stringResource(R.string.goles), //Goles
             color = Color.White,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "A", //Asistencias
+            text = stringResource(R.string.asistencias), //Asistencias
             color = Color.White,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "Posición",
+            text = stringResource(R.string.posicion),
             color = Color.White,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(2f),
