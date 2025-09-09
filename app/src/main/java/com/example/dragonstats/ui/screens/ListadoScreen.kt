@@ -133,7 +133,7 @@ fun DatosEquipo(equipo: Equipo?){
                             painter = if(isLiked)
                                 painterResource(R.drawable.ic_favoritefilled)
                             else
-                                painterResource(R.drawable.ic_favorite),
+                                painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
                             tint = if(isLiked) Color(0xFF4CAF50) else Color.Gray,
                             modifier = Modifier.size(24.dp)

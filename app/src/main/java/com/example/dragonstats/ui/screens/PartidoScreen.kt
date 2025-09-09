@@ -4,161 +4,150 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.Icon
 import com.example.dragonstats.R
+import com.example.dragonstats.data.CalendarioData
+import com.example.dragonstats.data.PlayerEvent
+import com.example.dragonstats.data.EventType
+import com.example.dragonstats.data.Team
 
-data class PlayerEvent(
-    val time: String,
-    val playerName: String,
-    val eventType: EventType
-)
-
-enum class EventType {
-    GOL, TARJETA_AMARILLA, TARJETA_ROJA, CAMBIO
-}
-
-data class MatchData(
-    val teamA: String,
-    val teamB: String,
-    val teamALogo: Int,
-    val teamBLogo: Int,
-    val scoreA: String,
-    val scoreB: String,
-    val date: String,
-    val leftTeamEvents: List<PlayerEvent>,
-    val rightTeamEvents: List<PlayerEvent>
-)
-
-object PartidoData {
-    fun getMatchData(): MatchData {
-        return MatchData(
-            teamA = "Real Madrid",
-            teamB = "FC Barcelona",
-            teamALogo = R.drawable.ic_equipo_default,
-            teamBLogo = R.drawable.ic_equipo_default,
-            scoreA = "2",
-            scoreB = "3",
-            date = "15/03/2024",
-            leftTeamEvents = listOf(
-                PlayerEvent("3'", "Miguel M.", EventType.GOL),
-                PlayerEvent("18'", "Edinson C.", EventType.TARJETA_AMARILLA),
-                PlayerEvent("23'", "Rodrigo B.", EventType.TARJETA_ROJA),
-                PlayerEvent("35'", "Leandro P.", EventType.CAMBIO),
-                PlayerEvent("67'", "Miguel M.", EventType.GOL),
-                PlayerEvent("82'", "Carlos P.", EventType.TARJETA_AMARILLA)
-            ),
-            rightTeamEvents = listOf(
-                PlayerEvent("12'", "Lucas N.", EventType.GOL),
-                PlayerEvent("29'", "Adrián M.", EventType.CAMBIO),
-                PlayerEvent("41'", "Santiago S.", EventType.TARJETA_AMARILLA),
-                PlayerEvent("54'", "Lucas N.", EventType.GOL),
-                PlayerEvent("73'", "Agustin A.", EventType.TARJETA_ROJA),
-                PlayerEvent("89'", "Adrián M.", EventType.GOL)
-            )
-        )
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PartidoDetailsScreen(onBackClick: () -> Unit = {}) {
-    val matchData = PartidoData.getMatchData()
+fun PartidoDetailsScreen(
+    onBackClick: () -> Unit = {},
+    matchId: Int = 1 // Valor por defecto para compatibilidad
+) {
+    val encuentro = CalendarioData.obtenerEncuentroPorId(matchId)
+
+    if (encuentro == null) {
+        // Si no se encuentra el partido, mostrar error
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Partido no encontrado",
+                color = Color.White,
+                fontSize = 18.sp
+            )
+        }
+        return
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(20.dp)
     ) {
-        // Back button
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF008934)
-            ),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(
-                text = "CALENDARIO",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+        // Barra de navegación superior similar a la segunda imagen
+        TopAppBar(
+            title = { },
+            navigationIcon = {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.padding(start = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Regresar",
+                        tint = Color.White
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorito",
+                        tint = Color.White
+                    )
+                }
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Más opciones",
+                        tint = Color.White
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Black
             )
-        }
-
-        // Title
-        Text(
-            text = "Descripción del partido",
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Match result section in card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0x66424242)),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
-            MatchResultSection(
-                matchData = matchData,
-                modifier = Modifier.padding(20.dp)
-            )
-        }
+            // Match result section in card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0x66424242)),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                MatchHeader(
+                    encuentro = encuentro,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // Events section
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            val maxEvents = maxOf(matchData.leftTeamEvents.size, matchData.rightTeamEvents.size)
-
-            items(maxEvents) { index ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+            // Solo mostrar eventos si el partido tiene resultado
+            if (encuentro.tieneResultado && encuentro.eventos.isNotEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Left team event
-                    if (index < matchData.leftTeamEvents.size) {
-                        EventCard(
-                            event = matchData.leftTeamEvents[index],
-                            isLeftTeam = true,
-                            modifier = Modifier.weight(1f)
+                    items(encuentro.eventos) { event ->
+                        EventItem(
+                            event = event,
+                            homeTeam = encuentro.equipo1,
+                            awayTeam = encuentro.equipo2
                         )
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
                     }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    // Right team event
-                    if (index < matchData.rightTeamEvents.size) {
-                        EventCard(
-                            event = matchData.rightTeamEvents[index],
-                            isLeftTeam = false,
-                            modifier = Modifier.weight(1f)
+                }
+            } else {
+                // Si no hay resultado, mostrar mensaje
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = if (encuentro.hora != null || encuentro.resultado != null) "Próximo partido" else "Partido pendiente",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
                         )
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
+                        if (encuentro.hora != null || encuentro.resultado != null) {
+                            val horaDisplay = encuentro.hora ?: encuentro.resultado ?: ""
+                            Text(
+                                text = "${encuentro.fecha} - $horaDisplay",
+                                color = Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
             }
@@ -167,174 +156,223 @@ fun PartidoDetailsScreen(onBackClick: () -> Unit = {}) {
 }
 
 @Composable
-private fun MatchResultSection(
-    matchData: MatchData,
+private fun MatchHeader(
+    encuentro: com.example.dragonstats.data.Encuentro,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Team A
-        TeamInfo(
-            teamName = matchData.teamA,
-            score = matchData.scoreA,
-            teamLogo = matchData.teamALogo
-        )
-
-        // Center info
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "-",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = matchData.date,
-                color = Color.Gray,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-
-        // Team B
-        TeamInfo(
-            teamName = matchData.teamB,
-            score = matchData.scoreB,
-            teamLogo = matchData.teamBLogo
-        )
-    }
-}
-
-@Composable
-private fun TeamInfo(teamName: String, score: String, teamLogo: Int) {
     Column(
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            painter = painterResource(id = teamLogo),
-            contentDescription = null,
-            tint = Color(0xFF4CAF50),
-            modifier = Modifier.size(48.dp)
-        )
+        // Resultado principal o información del partido
+        if (encuentro.tieneResultado) {
+            Text(
+                text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
+                color = Color.White,
+                fontSize = 48.sp,
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            // Mostrar hora del campo `hora` o `resultado`, sino "--:--"
+            val horaDisplay = encuentro.hora ?: encuentro.resultado ?: "--:--"
+            Text(
+                text = horaDisplay,
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = score,
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.ExtraBold
+            text = encuentro.fecha,
+            color = Color.Gray,
+            fontSize = 14.sp
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = teamName,
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-private fun EventCard(
-    event: PlayerEvent,
-    isLeftTeam: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF424242)),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
+        // Equipos
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = if (isLeftTeam) Arrangement.Start else Arrangement.End,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (isLeftTeam) {
-                // Left team: Icon - Time - Name
-                Icon(
-                    painter = painterResource(id = getEventIcon(event.eventType)),
-                    contentDescription = null,
-                    tint = getEventColor(event.eventType),
-                    modifier = Modifier.size(24.dp)
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = encuentro.equipo1.first().toString(),
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = event.time,
+                    text = encuentro.equipo1,
                     color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = event.playerName,
-                    color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
-            } else {
-                // Right team: Name - Time - Icon
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = encuentro.equipo2.first().toString(),
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
-                    text = event.playerName,
+                    text = encuentro.equipo2,
                     color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = event.time,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Icon(
-                    painter = painterResource(id = getEventIcon(event.eventType)),
-                    contentDescription = null,
-                    tint = getEventColor(event.eventType),
-                    modifier = Modifier.size(24.dp)
                 )
             }
         }
     }
 }
 
-private fun getEventIcon(eventType: EventType): Int {
-    return when (eventType) {
-        EventType.GOL -> R.drawable.ic_equipo_default
-        EventType.TARJETA_AMARILLA -> R.drawable.ic_equipo_default
-        EventType.TARJETA_ROJA -> R.drawable.ic_equipo_default
-        EventType.CAMBIO -> R.drawable.ic_equipo_default
+@Composable
+private fun EventItem(
+    event: PlayerEvent,
+    homeTeam: String,
+    awayTeam: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color(0xFF1A1A1A),
+                RoundedCornerShape(8.dp)
+            )
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = if (event.team == Team.HOME)
+            Arrangement.Start else Arrangement.End
+    ) {
+        if (event.team == Team.HOME) {
+            // Equipo local - alineado a la izquierda
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Avatar del jugador
+                PlayerAvatar(playerName = event.playerName)
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Minuto y nombre
+                Text(
+                    text = "${event.minute} ${event.playerName}",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Icono del evento
+                EventIcon(eventType = event.eventType)
+            }
+        } else {
+            // Equipo visitante - alineado a la derecha
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Icono del evento
+                EventIcon(eventType = event.eventType)
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Minuto y nombre
+                Text(
+                    text = "${event.minute} ${event.playerName}",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Avatar del jugador
+                PlayerAvatar(playerName = event.playerName)
+            }
+        }
     }
 }
 
-private fun getEventColor(eventType: EventType): Color {
-    return when (eventType) {
-        EventType.GOL -> Color(0xFF4CAF50)
-        EventType.TARJETA_AMARILLA -> Color(0xFFFFEB3B)
-        EventType.TARJETA_ROJA -> Color(0xFFF44336)
-        EventType.CAMBIO -> Color(0xFF2196F3)
+@Composable
+private fun PlayerAvatar(playerName: String) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(Color(0xFF4CAF50)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = playerName.first().toString(),
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun EventIcon(eventType: EventType) {
+    when (eventType) {
+        EventType.GOAL -> {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(Color(0xFF4CAF50), RoundedCornerShape(4.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "⚽",
+                    fontSize = 12.sp
+                )
+            }
+        }
+        EventType.YELLOW_CARD -> {
+            Box(
+                modifier = Modifier
+                    .size(16.dp, 20.dp)
+                    .background(Color(0xFFFFEB3B), RoundedCornerShape(2.dp))
+            )
+        }
+        EventType.RED_CARD -> {
+            Box(
+                modifier = Modifier
+                    .size(16.dp, 20.dp)
+                    .background(Color(0xFFF44336), RoundedCornerShape(2.dp))
+            )
+        }
     }
 }

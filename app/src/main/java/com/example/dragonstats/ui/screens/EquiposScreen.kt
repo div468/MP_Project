@@ -40,7 +40,6 @@ import com.example.dragonstats.data.Equipo
 import com.example.dragonstats.data.TorneoData
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
-import com.example.dragonstats.ui.navigation.AppNavHost
 
 @Composable
 fun EquiposScreen(navController: NavController) {
@@ -178,7 +177,7 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                             painter = if(isFavorito)
                                 painterResource(R.drawable.ic_favoritefilled)
                             else
-                                painterResource(R.drawable.ic_favorite),
+                                painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
                             tint = if(isFavorito) Color(0xFF4CAF50) else Color.Gray,
                             modifier = Modifier.size(24.dp)

@@ -24,7 +24,7 @@ import com.example.dragonstats.data.CalendarioData
 import com.example.dragonstats.ui.navigation.Screen
 
 @Composable
-fun CalendarioScreen(onPartidoClick: () -> Unit) {
+fun CalendarioScreen(onPartidoClick: (Int) -> Unit) {
     val encuentros = CalendarioData.obtenerEncuentros()
 
     Column(
@@ -60,7 +60,7 @@ fun CalendarioScreen(onPartidoClick: () -> Unit) {
 }
 
 @Composable
-private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> Unit) {
+private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: (Int) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.dark_gray)),
@@ -86,7 +86,7 @@ private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> U
                 jornada.encuentros.forEach { encuentro ->
                     EncuentroItem(
                         encuentro = encuentro,
-                        onPartidoClick = onPartidoClick
+                        onPartidoClick = { onPartidoClick(encuentro.id) }
                     )
 
                     // Divisor entre encuentros (excepto el último)
