@@ -1,6 +1,7 @@
 package com.example.dragonstats.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,7 +21,7 @@ import com.example.dragonstats.data.Encuentro
 import com.example.dragonstats.data.CalendarioData
 
 @Composable
-fun CalendarioScreen() {
+fun CalendarioScreen(onPartidoClick: () -> Unit) {
     val encuentros = CalendarioData.obtenerEncuentros()
 
     Column(
@@ -30,7 +32,7 @@ fun CalendarioScreen() {
     ) {
         // Header
         Text(
-            text = "Próximos encuentros",
+            text = stringResource(id = R.string.calendario_screen_title),
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -45,14 +47,17 @@ fun CalendarioScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(encuentros) { jornada ->
-                JornadaCard(jornada = jornada)
+                JornadaCard(
+                    jornada = jornada,
+                    onPartidoClick = onPartidoClick
+                )
             }
         }
     }
 }
 
 @Composable
-private fun JornadaCard(jornada: CalendarioData.Jornada) {
+private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -76,7 +81,10 @@ private fun JornadaCard(jornada: CalendarioData.Jornada) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 jornada.encuentros.forEach { encuentro ->
-                    EncuentroItem(encuentro = encuentro)
+                    EncuentroItem(
+                        encuentro = encuentro,
+                        onPartidoClick = onPartidoClick
+                    )
 
                     // Divisor entre encuentros (excepto el último)
                     if (encuentro != jornada.encuentros.last()) {
@@ -93,9 +101,11 @@ private fun JornadaCard(jornada: CalendarioData.Jornada) {
 }
 
 @Composable
-private fun EncuentroItem(encuentro: Encuentro) {
+private fun EncuentroItem(encuentro: Encuentro, onPartidoClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onPartidoClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
