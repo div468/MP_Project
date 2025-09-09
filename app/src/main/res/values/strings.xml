@@ -24,6 +24,7 @@
     <string name="header_phase2">Cuartos de final</string>
     <string name="header_phase3">Semifinal</string>
     <string name="header_phase4">FINAL</string>
+
     <!-- CalendarScreen -->
     <string name="calendario_screen_title">Próximos encuentros</string>
 

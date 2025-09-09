@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,7 +61,7 @@ fun CalendarioScreen(onPartidoClick: () -> Unit) {
 private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.dark_gray)),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -90,8 +91,7 @@ private fun JornadaCard(jornada: CalendarioData.Jornada, onPartidoClick: () -> U
                     if (encuentro != jornada.encuentros.last()) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 4.dp),
-                            thickness = 1.dp,
-                            color = Color(0xFF333333)
+                            thickness = 1.dp
                         )
                     }
                 }
@@ -117,7 +117,7 @@ private fun EncuentroItem(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_equipo_default),
                 contentDescription = null,
-                tint = Color(0xFF4CAF50),
+                tint = colorResource(id = R.color.green_calendar),
                 modifier = Modifier.size(24.dp)
             )
 
@@ -168,7 +168,7 @@ private fun EncuentroItem(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_equipo_default),
                 contentDescription = null,
-                tint = Color(0xFF4CAF50),
+                tint = colorResource(id = R.color.green_calendar),
                 modifier = Modifier.size(24.dp)
             )
         }
