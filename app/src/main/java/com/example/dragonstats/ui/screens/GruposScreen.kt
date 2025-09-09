@@ -21,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dragonstats.R
 import com.example.dragonstats.ui.screens.tabs.BracketStageTab
 import com.example.dragonstats.ui.screens.tabs.FaseGruposTab
 
@@ -67,14 +69,14 @@ private fun CustomTabRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CustomTab(
-            text = "Fase de grupos",
+            text = stringResource(id = R.string.tab_fase_grupos),
             selected = selectedTab == GruposTab.FASE_GRUPOS,
             onClick = { onTabSelected(GruposTab.FASE_GRUPOS) },
             modifier = Modifier.weight(1f)
         )
 
         CustomTab(
-            text = "Bracket Stage",
+            text = stringResource(id = R.string.tab_bracket_stage),
             selected = selectedTab == GruposTab.BRACKET_STAGE,
             onClick = { onTabSelected(GruposTab.BRACKET_STAGE) },
             modifier = Modifier.weight(1f)
