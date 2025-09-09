@@ -7,10 +7,8 @@
     <string name="nav_equipos">Equipos</string>
 
     <!-- Screens -->
-    <string name="screen_calendario">Pantalla de Calendario</string>
-    <string name="screen_equipos">Pantalla de Equipos</string>
-    <string name="screen_bracket_stage">Pantalla de Bracket Stage</string>
-    <string name="development_placeholder">(En desarrollo)</string>
+    <string name="screen_calendario">Calendario</string>
+    <string name="screen_equipos">Equipos</string>
 
     <!-- Tabs -->
     <string name="tab_fase_grupos">Fase de grupos</string>

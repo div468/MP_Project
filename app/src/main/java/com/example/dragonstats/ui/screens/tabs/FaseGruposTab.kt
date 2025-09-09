@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,21 +81,21 @@ private fun GrupoCard(grupo: Grupo) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "P",
+                        text = stringResource(id = R.string.header_partidos),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
                     Text(
-                        text = "GD",
+                        text = stringResource(id = R.string.header_gol_diferencia),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
                     Text(
-                        text = "Pts.",
+                        text = stringResource(id = R.string.header_puntos),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
