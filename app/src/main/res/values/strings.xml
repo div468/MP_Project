@@ -23,4 +23,17 @@
 
     <!-- CalendarScreen -->
     <string name="calendario_screen_title">Próximos encuentros</string>
+
+    <!-- ListadoScreen -->
+    <string name="back_icon_description">Volver</string>
+    <string name="list_title">Listado de Jugadores</string>
+    <string name="logo_equipo">Logo del equipo</string>
+    <string name="ganados">Ganados: </string>
+    <string name="empatados"> Empatados: </string>
+    <string name="perdidos"> Perdidos: </string>
+    <string name="ptsTotal">Pts. Totales: </string>
+    <string name="jugador">Jugador</string>
+    <string name="goles">G</string>
+    <string name="asistencias">A</string>
+    <string name="posicion">P</string>
 </resources>
