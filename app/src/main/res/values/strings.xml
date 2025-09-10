@@ -28,6 +28,13 @@
     <!-- CalendarScreen -->
     <string name="calendario_screen_title">Próximos encuentros</string>
 
+    <!-- PatidooScreen -->
+    <string name="partido_screen_title">Descripcion Partido</string>
+    <string name="partido_no_encontrado">Partido no encontrado</string>">
+    <string name="proximo_partido">Próximo partido</string>">
+    <string name="partido_pendiente">Partido pendiente</string>
+
+
     <!-- ListadoScreen -->
     <string name="back_icon_description">Volver</string>
     <string name="list_title">Listado de Jugadores</string>

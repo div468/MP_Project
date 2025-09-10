@@ -43,7 +43,7 @@ fun PartidoDetailsScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Partido no encontrado",
+                text = R.string.partido_no_encontrado.toString(),
                 color = Color.White,
                 fontSize = 18.sp
             )
@@ -135,7 +135,7 @@ fun PartidoDetailsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (encuentro.hora != null || encuentro.resultado != null) "Próximo partido" else "Partido pendiente",
+                            text = if (encuentro.hora != null || encuentro.resultado != null) R.string.proximo_partido.toString() else R.string.partido_pendiente.toString(),
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium
