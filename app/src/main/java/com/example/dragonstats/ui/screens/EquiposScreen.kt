@@ -39,6 +39,7 @@ import com.example.dragonstats.R
 import com.example.dragonstats.data.Equipo
 import com.example.dragonstats.data.TorneoData
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 
 @Composable
@@ -52,7 +53,7 @@ fun EquiposScreen(navController: NavController) {
             .padding(horizontal = 16.dp)
     ){
         Text(
-            text = "Listado de Equipos",
+            text = stringResource(id = R.string.list_title_equipos),
             color = Color.White,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
@@ -139,16 +140,16 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                         onClick = onVerJugadores,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF4CAF50),
-                            contentColor = Color.White
+                            contentColor = Color.Black
                         ),
                         shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                         modifier = Modifier.height(32.dp)
                     ) {
                         Text(
-                            text = "Ver jugadores",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.verJugadores),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
@@ -159,12 +160,12 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) { //Informacion de los equipos
                     Text(
-                        text = "Puntos: ${equipo.puntos}",
+                        text = stringResource(R.string.puntos)+ " " + equipo.puntos,
                         color = Color.White,
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "Grupo: ${equipo.grupo}",
+                        text = stringResource(R.string.grupo)+ " " + equipo.grupo,
                         color = Color.White,
                         fontSize = 14.sp
                     )
@@ -179,7 +180,7 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                             else
                                 painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
-                            tint = if(isFavorito) Color(0xFF4CAF50) else Color.Gray,
+                            tint = if(isFavorito) Color(0xFF4CAF50) else Color(0xFF4CAF50),
                             modifier = Modifier.size(24.dp)
                         )
                     }
