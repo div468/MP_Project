@@ -37,10 +37,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dragonstats.R
-import com.example.dragonstats.data.Equipo
-import com.example.dragonstats.data.Match
-import com.example.dragonstats.data.Round
-import com.example.dragonstats.data.TorneoData
+import com.example.dragonstats.data.model.Equipo
+import com.example.dragonstats.data.model.Match
+import com.example.dragonstats.data.model.Round
+import com.example.dragonstats.data.model.TorneoData
 
 @Composable
 fun TeamBox(team: Equipo) {
@@ -238,8 +238,8 @@ fun BracketStageTab() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewMatchCard() {
-    val match = Equipo(1, "Dragons FC", 3, 5, 9, "A")
-    val match2 = Equipo(2, "Phoenix United", 3, 2, 7, "A")
+    val match = Equipo(1, "Dragons FC", 3, 5, 9, 7,1,1,"C")
+    val match2 = Equipo(2, "Phoenix United", 3, 2, 7, 7,1,1,"C")
 
     val match6 = Match(
         teamA = match,
@@ -335,10 +335,13 @@ private fun createDummyMatches(count: Int): List<Match> {
 private fun createDummyTeam(name: String): Equipo {
     return Equipo(
         id = 0,
-        nombre = name,
+        nombre = "",
+        empatados = 0,
+        ganados = 0,
+        golesContra= 0,
+        golesFavor = 0,
+        perdidos = 0,
         puntos = 0,
-        golDiferencia = 0,
-        grupo = "X",
-        partidos = 0,
+        grupo = ""
     )
 }

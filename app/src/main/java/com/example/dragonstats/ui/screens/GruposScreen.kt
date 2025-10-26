@@ -25,16 +25,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dragonstats.R
 import com.example.dragonstats.ui.screens.tabs.BracketStageTab
 import com.example.dragonstats.ui.screens.tabs.FaseGruposTab
+import com.example.dragonstats.ui.viewmodel.GruposViewModel
 
 enum class GruposTab {
     FASE_GRUPOS, BRACKET_STAGE
 }
 
 @Composable
-fun GruposScreen() {
+fun GruposScreen(
+    viewModel: GruposViewModel = viewModel()
+) {
     var selectedTab by remember { mutableStateOf(GruposTab.FASE_GRUPOS) }
 
     Column(
@@ -52,7 +56,7 @@ fun GruposScreen() {
 
         // Tab Content
         when (selectedTab) {
-            GruposTab.FASE_GRUPOS -> FaseGruposTab()
+            GruposTab.FASE_GRUPOS -> FaseGruposTab(viewModel = viewModel)
             GruposTab.BRACKET_STAGE -> BracketStageTab()
         }
     }

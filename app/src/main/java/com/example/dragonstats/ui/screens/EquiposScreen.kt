@@ -36,8 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dragonstats.R
-import com.example.dragonstats.data.Equipo
-import com.example.dragonstats.data.TorneoData
+import com.example.dragonstats.data.model.Equipo
+import com.example.dragonstats.data.model.TorneoData
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
