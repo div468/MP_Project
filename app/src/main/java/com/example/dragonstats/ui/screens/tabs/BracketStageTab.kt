@@ -18,14 +18,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
@@ -40,7 +46,8 @@ import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Match
 import com.example.dragonstats.data.model.Round
-import com.example.dragonstats.data.model.TorneoData
+import com.example.dragonstats.ui.viewmodel.GruposUiState
+import com.example.dragonstats.ui.viewmodel.GruposViewModel
 
 @Composable
 fun TeamBox(team: Equipo) {
@@ -49,9 +56,7 @@ fun TeamBox(team: Equipo) {
         modifier = Modifier.width(40.dp)
     ) {
         Box(
-            modifier = Modifier
-                .size(30.dp)
-
+            modifier = Modifier.size(30.dp)
         ){
             Image(
                 painter = painterResource(id = team.shield),
@@ -62,7 +67,7 @@ fun TeamBox(team: Equipo) {
         }
         Spacer(Modifier.height(4.dp))
         Text(
-            text = team.nombre.substring(0,3).uppercase(),
+            text = if (team.nombre.length >= 3) team.nombre.substring(0,3).uppercase() else team.nombre.uppercase(),
             style = MaterialTheme.typography.labelSmall,
             fontSize = 10.sp,
             maxLines = 1
@@ -81,7 +86,6 @@ fun MatchCard(match: Match, modifier: Modifier) {
         colors = CardDefaults.cardColors(
             containerColor = colorResource(id = R.color.dark_gray)
         )
-
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(6.dp),
@@ -106,25 +110,6 @@ fun MatchCard(match: Match, modifier: Modifier) {
 }
 
 @Composable
-fun MatchCardsLazyRow(matches: List<Match>) {
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(matches) { match ->
-            MatchCard(
-                match = match,
-                modifier = Modifier,
-            )
-        }
-    }
-}
-
-@Composable
 fun CenteredMatchRow(matches: List<Match>) {
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -135,19 +120,119 @@ fun CenteredMatchRow(matches: List<Match>) {
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
             items(matches) { match ->
-                MatchCard(match = match,
-                    modifier = Modifier)
+                MatchCard(match = match, modifier = Modifier)
             }
         }
     }
 }
 
 @Composable
-fun BracketStageTab() {
-    val octavos = remember { createOctavos() }
-    val quarterFinals = remember { createQuarterFinals() }
-    val semiFinals = remember { createSemiFinals() }
-    val finalMatch = remember { createFinal() }
+fun BracketStageTab(viewModel: GruposViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when (val state = uiState) {
+            is GruposUiState.Loading -> {
+                LoadingStateBracket()
+            }
+            is GruposUiState.Success -> {
+                BracketContent(
+                    viewModel = viewModel,
+                    topTeams = state.topTeams
+                )
+            }
+            is GruposUiState.Error -> {
+                ErrorStateBracket(
+                    message = state.message,
+                    onRetry = { viewModel.retry() }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoadingStateBracket() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                color = Color(0xFF4CAF50),
+                modifier = Modifier.size(48.dp)
+            )
+            Text(
+                text = "Cargando bracket...",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun ErrorStateBracket(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_calendar),
+                contentDescription = null,
+                tint = Color(0xFFF44336),
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = "Error al cargar el bracket",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = message,
+                color = Color.Gray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50)
+                )
+            ) {
+                Text(
+                    text = "Reintentar",
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BracketContent(
+    viewModel: GruposViewModel,
+    topTeams: List<Equipo>
+) {
+    val octavos = viewModel.createOctavos(topTeams)
+    val quarterFinals = viewModel.createQuarterFinals()
+    val semiFinals = viewModel.createSemiFinals()
+    val finalMatch = viewModel.createFinal()
+
     val topRounds = listOf(
         Round(
             phase = stringResource(id = R.string.header_phase1),
@@ -194,7 +279,8 @@ fun BracketStageTab() {
                 Text(
                     text = round.phase,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 CenteredMatchRow(round.matches)
@@ -206,7 +292,8 @@ fun BracketStageTab() {
         Text(
             text = stringResource(id = R.string.header_phase4),
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black
+            fontWeight = FontWeight.Black,
+            color = Color.White
         )
         Spacer(modifier = Modifier.height(8.dp))
         MatchCard(
@@ -226,7 +313,8 @@ fun BracketStageTab() {
                 Text(
                     text = round.phase,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 CenteredMatchRow(round.matches)
@@ -264,84 +352,19 @@ fun PreviewMatchCard() {
 
     val matchList: List<Match> = listOf(match6, match7, match8, match9)
 
-    MatchCardsLazyRow(
-        matches = matchList
-    )
-}
-
-private fun createOctavos(): List<Match> {
-    val teams = getTopTeamsFromGroups(16)
-
-    return if (teams.size >= 16) {
-        listOf(
-            Match(teams[0], teams[15], "0 - 0"),
-            Match(teams[1], teams[14], "0 - 0"),
-            Match(teams[2], teams[13], "0 - 0"),
-            Match(teams[3], teams[12], "0 - 0"),
-            Match(teams[4], teams[11], "0 - 0"),
-            Match(teams[5], teams[10], "0 - 0"),
-            Match(teams[6], teams[9], "0 - 0"),
-            Match(teams[7], teams[8], "0 - 0")
-        )
-    } else {
-        createDummyMatches(8)
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(matchList) { match ->
+            MatchCard(
+                match = match,
+                modifier = Modifier,
+            )
+        }
     }
-}
-
-private fun createQuarterFinals(): List<Match> {
-    return listOf(
-        Match(createDummyTeam("Ganador O1"), createDummyTeam("Ganador O2"), "0 - 0"),
-        Match(createDummyTeam("Ganador O3"), createDummyTeam("Ganador O4"), "0 - 0"),
-        Match(createDummyTeam("Ganador O5"), createDummyTeam("Ganador O6"), "0 - 0"),
-        Match(createDummyTeam("Ganador O7"), createDummyTeam("Ganador O8"), "0 - 0")
-    )
-}
-
-private fun createSemiFinals(): List<Match> {
-    return listOf(
-        Match(createDummyTeam("Ganador QF1"), createDummyTeam("Ganador QF2"), "0 - 0"),
-        Match(createDummyTeam("Ganador QF3"), createDummyTeam("Ganador QF4"), "0 - 0")
-    )
-}
-
-private fun createFinal(): Match {
-    return Match(
-        createDummyTeam("Ganador SF1"),
-        createDummyTeam("Ganador SF2"),
-        "0 - 0"
-    )
-}
-
-private fun getTopTeamsFromGroups(count: Int): List<Equipo> {
-    return try {
-        TorneoData.obtenerGruposOrdenados()
-            .flatMap { it.equipos.take(2) }
-            .take(count)
-    } catch (e: Exception) {
-        emptyList()
-    }
-}
-
-private fun createDummyMatches(count: Int): List<Match> {
-    return List(count) { index ->
-        Match(
-            createDummyTeam("Equipo ${index * 2 + 1}"),
-            createDummyTeam("Equipo ${index * 2 + 2}"),
-            "0 - 0"
-        )
-    }
-}
-
-private fun createDummyTeam(name: String): Equipo {
-    return Equipo(
-        id = 0,
-        nombre = "",
-        empatados = 0,
-        ganados = 0,
-        golesContra= 0,
-        golesFavor = 0,
-        perdidos = 0,
-        puntos = 0,
-        grupo = ""
-    )
 }

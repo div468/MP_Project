@@ -54,10 +54,10 @@ fun GruposScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
         )
 
-        // Tab Content
+        // Tab Content - Pasar el viewModel a ambas tabs
         when (selectedTab) {
             GruposTab.FASE_GRUPOS -> FaseGruposTab(viewModel = viewModel)
-            GruposTab.BRACKET_STAGE -> BracketStageTab()
+            GruposTab.BRACKET_STAGE -> BracketStageTab(viewModel = viewModel)
         }
     }
 }
