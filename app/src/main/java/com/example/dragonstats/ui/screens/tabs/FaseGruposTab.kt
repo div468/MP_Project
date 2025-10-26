@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -159,14 +160,14 @@ private fun GrupoCard(grupo: Grupo) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Header del grupo con columnas
+            // Header del grupo con columnas alineadas
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Nombre del grupo
                 Text(
                     text = grupo.nombre,
                     color = Color.White,
@@ -175,33 +176,33 @@ private fun GrupoCard(grupo: Grupo) {
                     modifier = Modifier.weight(1f)
                 )
 
-                // Headers de columnas
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.header_partidos),
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.header_gol_diferencia),
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.header_puntos),
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    )
-                }
+                // Headers de columnas con ancho fijo
+                Text(
+                    text = stringResource(id = R.string.header_partidos),
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(40.dp)
+                )
+
+                Text(
+                    text = stringResource(id = R.string.header_gol_diferencia),
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(50.dp)
+                )
+
+                Text(
+                    text = stringResource(id = R.string.header_puntos),
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(50.dp)
+                )
             }
 
             // Lista de equipos
@@ -226,10 +227,9 @@ private fun EquipoItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Posición, icono y nombre
+        // Posición, icono y nombre del equipo
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
@@ -239,7 +239,8 @@ private fun EquipoItem(
                 text = posicion.toString(),
                 color = Color.White,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.width(20.dp),
+                textAlign = TextAlign.Center
             )
 
             // Icono del equipo con color según posición
@@ -255,7 +256,7 @@ private fun EquipoItem(
                 tint = iconColor,
                 modifier = Modifier
                     .size(24.dp)
-                    .padding(end = 12.dp)
+                    .padding(start = 4.dp, end = 8.dp)
             )
 
             // Nombre del equipo
@@ -267,30 +268,30 @@ private fun EquipoItem(
             )
         }
 
-        // Stats
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = equipo.partidos.toString(),
-                color = Color.White,
-                fontSize = 14.sp
-            )
+        // Stats con anchos fijos para alineación
+        Text(
+            text = equipo.partidos.toString(),
+            color = Color.White,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
 
-            Text(
-                text = if (equipo.golDiferencia > 0) "+${equipo.golDiferencia}" else equipo.golDiferencia.toString(),
-                color = Color.White,
-                fontSize = 14.sp
-            )
+        Text(
+            text = if (equipo.golDiferencia > 0) "+${equipo.golDiferencia}" else equipo.golDiferencia.toString(),
+            color = Color.White,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(50.dp)
+        )
 
-            Text(
-                text = equipo.puntos.toString(),
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(end = 4.dp)
-            )
-        }
+        Text(
+            text = equipo.puntos.toString(),
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(50.dp)
+        )
     }
 }
