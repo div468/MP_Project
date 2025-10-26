@@ -38,9 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dragonstats.R
-import com.example.dragonstats.data.Equipo
-import com.example.dragonstats.data.Jugador
-import com.example.dragonstats.data.TorneoData
+import com.example.dragonstats.data.model.Equipo
+import com.example.dragonstats.data.model.Jugador
+import com.example.dragonstats.data.model.TorneoData
 
 @Composable
 fun ListadoScreen (e: Int, navController: NavController){

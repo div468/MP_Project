@@ -1,6 +1,4 @@
-package com.example.dragonstats.data
-
-import android.media.audiofx.DynamicsProcessing.Eq
+package com.example.dragonstats.data.model
 
 data class Match(
     val teamA: Equipo,

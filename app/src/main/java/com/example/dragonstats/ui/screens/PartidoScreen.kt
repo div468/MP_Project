@@ -16,15 +16,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dragonstats.R
-import com.example.dragonstats.data.CalendarioData
-import com.example.dragonstats.data.PlayerEvent
-import com.example.dragonstats.data.EventType
-import com.example.dragonstats.data.Team
+import com.example.dragonstats.data.model.CalendarioData
+import com.example.dragonstats.data.model.PlayerEvent
+import com.example.dragonstats.data.model.EventType
+import com.example.dragonstats.data.model.Team
+import com.example.dragonstats.data.model.Encuentro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -157,7 +157,7 @@ fun PartidoDetailsScreen(
 
 @Composable
 private fun MatchHeader(
-    encuentro: com.example.dragonstats.data.Encuentro,
+    encuentro: Encuentro,
     modifier: Modifier = Modifier
 ) {
     Column(

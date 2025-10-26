@@ -1,4 +1,4 @@
-package com.example.dragonstats.data
+package com.example.dragonstats.data.model
 
 data class Jugador(
     val id: Int,

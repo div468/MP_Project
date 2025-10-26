@@ -17,11 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.dragonstats.R
-import com.example.dragonstats.data.Encuentro
-import com.example.dragonstats.data.CalendarioData
-import com.example.dragonstats.ui.navigation.Screen
+import com.example.dragonstats.data.model.Encuentro
+import com.example.dragonstats.data.model.CalendarioData
 
 @Composable
 fun CalendarioScreen(onPartidoClick: (Int) -> Unit) {
