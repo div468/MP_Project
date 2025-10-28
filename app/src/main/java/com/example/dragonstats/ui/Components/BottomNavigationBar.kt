@@ -32,16 +32,18 @@ fun BottomNavigationBar(navController: NavController) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val currentRoute = currentDestination?.route
 
     NavigationBar(
         containerColor = Color(0xFF4CAF50)
     ) {
         items.forEach { item ->
-            val isCalendario = item.screen == Screen.Calendario
-            val isSelected = currentDestination?.hierarchy?.any {
-                if (isCalendario) it.route?.startsWith("calendario") == true
-                else it.route == item.screen.route
+            val isSelected = currentDestination?.hierarchy?.any { 
+                val route = it.route ?: ""
+                when (item.screen) {
+                    Screen.Calendario -> route.startsWith("calendario")
+                    Screen.Grupos -> route == "grupos" || route.startsWith("grupos/")
+                    else -> route == item.screen.route
+                }
             } == true
 
             NavigationBarItem(
@@ -55,7 +57,7 @@ fun BottomNavigationBar(navController: NavController) {
                 selected = isSelected,
                 onClick = {
                     if (!isSelected) {
-                        val route = if (isCalendario) {
+                        val route = if (item.screen == Screen.Calendario) {
                             Screen.Calendario.createRoute(1)
                         } else {
                             item.screen.route

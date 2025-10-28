@@ -1,6 +1,7 @@
 package com.example.dragonstats.ui.screens.tabs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,20 +42,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.dragonstats.R
+import com.example.dragonstats.data.model.Encuentro
 import com.example.dragonstats.data.model.Equipo
-import com.example.dragonstats.data.model.Match
 import com.example.dragonstats.data.model.Round
 import com.example.dragonstats.ui.viewmodel.GruposUiState
 import com.example.dragonstats.ui.viewmodel.GruposViewModel
 
 @Composable
-fun TeamBox(team: Equipo) {
-    val words = team.nombre.split(' ').filter { it.isNotEmpty() }
+fun TeamBox(teamName: String) {
+    val words = teamName.split(' ').filter { it.isNotEmpty() }
     val initials = if (words.size == 2) {
         (words[0].take(1) + words[1].take(2)).uppercase()
     } else {
-        team.nombre.take(3).uppercase()
+        teamName.take(3).uppercase()
     }
 
     Column(
@@ -79,11 +81,14 @@ fun TeamBox(team: Equipo) {
 }
 
 @Composable
-fun MatchCard(match: Match, modifier: Modifier) {
+fun EncuentroCard(encuentro: Encuentro, modifier: Modifier, onClick: () -> Unit) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val cardWidth = (screenWidth - 24.dp - 64.dp) / 4
     Card(
-        modifier = Modifier.width(cardWidth).height(80.dp),
+        modifier = Modifier
+            .width(cardWidth)
+            .height(80.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(30.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -100,11 +105,11 @@ fun MatchCard(match: Match, modifier: Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ){
-                TeamBox(team = match.teamA)
-                TeamBox(team = match.teamB)
+                TeamBox(teamName = encuentro.equipo1)
+                TeamBox(teamName = encuentro.equipo2)
             }
             Text(
-                text = match.score,
+                text = encuentro.resultado ?: "0-0",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -114,7 +119,7 @@ fun MatchCard(match: Match, modifier: Modifier) {
 }
 
 @Composable
-fun CenteredMatchRow(matches: List<Match>) {
+fun CenteredMatchRow(encuentros: List<Encuentro>, navController: NavController) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -123,15 +128,17 @@ fun CenteredMatchRow(matches: List<Match>) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
-            items(matches) { match ->
-                MatchCard(match = match, modifier = Modifier)
+            items(encuentros) { encuentro ->
+                EncuentroCard(encuentro = encuentro, modifier = Modifier, onClick = {
+                    navController.navigate("grupos/partido/${encuentro.id}")
+                })
             }
         }
     }
 }
 
 @Composable
-fun BracketStageTab(viewModel: GruposViewModel) {
+fun BracketStageTab(viewModel: GruposViewModel, navController: NavController) {
     val uiState by viewModel.uiState.collectAsState()
 
     Box(
@@ -144,7 +151,8 @@ fun BracketStageTab(viewModel: GruposViewModel) {
             is GruposUiState.Success -> {
                 BracketContent(
                     viewModel = viewModel,
-                    topTeams = state.topTeams
+                    topTeams = state.topTeams,
+                    navController = navController
                 )
             }
             is GruposUiState.Error -> {
@@ -230,7 +238,8 @@ private fun ErrorStateBracket(
 @Composable
 private fun BracketContent(
     viewModel: GruposViewModel,
-    topTeams: List<Equipo>
+    topTeams: List<Equipo>,
+    navController: NavController
 ) {
     val quarterFinals = viewModel.createQuarterFinals(topTeams)
     val semiFinals = viewModel.createSemiFinals()
@@ -239,22 +248,22 @@ private fun BracketContent(
     val topRounds = listOf(
         Round(
             phase = stringResource(id = R.string.header_phase2),
-            matches = quarterFinals.take(2),
+            encuentros = quarterFinals.take(2),
         ),
         Round(
             phase = stringResource(id = R.string.header_phase3),
-            matches = semiFinals.take(1),
+            encuentros = semiFinals.take(1),
         )
     )
 
     val bottomRounds = listOf(
         Round(
             phase = stringResource(id = R.string.header_phase3),
-            matches = semiFinals.drop(1),
+            encuentros = semiFinals.drop(1),
         ),
         Round(
             phase = stringResource(id = R.string.header_phase2),
-            matches = quarterFinals.drop(2),
+            encuentros = quarterFinals.drop(2),
         )
     )
 
@@ -278,7 +287,7 @@ private fun BracketContent(
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                CenteredMatchRow(round.matches)
+                CenteredMatchRow(round.encuentros, navController = navController)
             }
         }
 
@@ -291,11 +300,14 @@ private fun BracketContent(
             color = Color.White
         )
         Spacer(modifier = Modifier.height(8.dp))
-        MatchCard(
-            match = finalMatch,
+        EncuentroCard(
+            encuentro = finalMatch,
             modifier = Modifier
                 .width(180.dp)
-                .height(120.dp)
+                .height(120.dp),
+            onClick = {
+                navController.navigate("grupos/partido/${finalMatch.id}")
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -312,7 +324,7 @@ private fun BracketContent(
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                CenteredMatchRow(round.matches)
+                CenteredMatchRow(round.encuentros, navController = navController)
             }
         }
     }
@@ -321,31 +333,12 @@ private fun BracketContent(
 @Preview(showBackground = true)
 @Composable
 fun PreviewMatchCard() {
-    val match = Equipo(1, "Dragons FC", 3, 5, 9, 7,1,1,"C")
-    val match2 = Equipo(2, "Phoenix United", 3, 2, 7, 7,1,1,"C")
+    val match = Encuentro(1, "Dragons FC", "Phoenix United", "", "", "0-0", 5)
+    val match2 = Encuentro(2, "Dragons FC", "Phoenix United", "", "", "1-1", 5)
+    val match3 = Encuentro(3, "Dragons FC", "Phoenix United", "", "", "2-0", 5)
+    val match4 = Encuentro(4, "Dragons FC", "Phoenix United", "", "", "0-2", 5)
 
-    val match6 = Match(
-        teamA = match,
-        teamB = match2,
-        score = "0 - 0"
-    )
-    val match7 = Match(
-        teamA = match,
-        teamB = match2,
-        score = "1 - 1"
-    )
-    val match8 = Match(
-        teamA = match,
-        teamB = match2,
-        score = "2 - 0"
-    )
-    val match9 = Match(
-        teamA = match,
-        teamB = match2,
-        score = "0 - 2"
-    )
-
-    val matchList: List<Match> = listOf(match6, match7, match8, match9)
+    val matchList: List<Encuentro> = listOf(match, match2, match3, match4)
 
     LazyRow(
         modifier = Modifier
@@ -355,10 +348,11 @@ fun PreviewMatchCard() {
         verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
-        items(matchList) { match ->
-            MatchCard(
-                match = match,
+        items(matchList) { encuentro ->
+            EncuentroCard(
+                encuentro = encuentro,
                 modifier = Modifier,
+                onClick = {}
             )
         }
     }

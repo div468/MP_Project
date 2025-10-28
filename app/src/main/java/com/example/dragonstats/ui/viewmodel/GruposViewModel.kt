@@ -2,9 +2,9 @@ package com.example.dragonstats.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dragonstats.data.model.Encuentro
 import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Grupo
-import com.example.dragonstats.data.model.Match
 import com.example.dragonstats.data.repository.EquipoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +44,7 @@ class GruposViewModel : ViewModel() {
         fetchGrupos()
     }
 
-    fun createQuarterFinals(topTeams: List<Equipo>): List<Match> {
+    fun createQuarterFinals(topTeams: List<Equipo>): List<Encuentro> {
         val teamsByGroup = topTeams.groupBy { it.grupo }
 
         val teamA1 = teamsByGroup["A"]?.getOrNull(0) ?: Equipo(nombre = "A1")
@@ -57,23 +57,21 @@ class GruposViewModel : ViewModel() {
         val teamD2 = teamsByGroup["D"]?.getOrNull(1) ?: Equipo(nombre = "D2")
 
         return listOf(
-            Match(teamA1, teamD2, "0-0"),
-            Match(teamC1, teamB2, "0-0"),
-            Match(teamB1, teamC2, "0-0"),
-            Match(teamD1, teamA2, "0-0"),
+            Encuentro(1, teamA1.nombre, teamD2.nombre, "", "", "0-0", 5),
+            Encuentro(2, teamC1.nombre, teamB2.nombre, "", "", "0-0", 5),
+            Encuentro(3, teamB1.nombre, teamC2.nombre, "", "", "0-0", 5),
+            Encuentro(4, teamD1.nombre, teamA2.nombre, "", "", "0-0", 5),
         )
     }
 
-    fun createSemiFinals(): List<Match> {
-        val placeholder = Equipo(nombre = "TBD")
+    fun createSemiFinals(): List<Encuentro> {
         return listOf(
-            Match(placeholder, placeholder, "0-0"),
-            Match(placeholder, placeholder, "0-0")
+            Encuentro(5, "TBD", "TBD", "", "", "0-0", 6),
+            Encuentro(6, "TBD", "TBD", "", "", "0-0", 6)
         )
     }
 
-    fun createFinal(): Match {
-        val placeholder = Equipo(nombre = "TBD")
-        return Match(placeholder, placeholder, "0-0")
+    fun createFinal(): Encuentro {
+        return Encuentro(7, "TBD", "TBD", "", "", "0-0", 7)
     }
 }

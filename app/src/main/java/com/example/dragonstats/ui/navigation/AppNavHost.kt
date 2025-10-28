@@ -25,6 +25,8 @@ sealed class Screen(val route: String, val title: String) {
 
 private const val EQUIPOS_LIST_ROUTE = "equipos_list"
 private const val EQUIPOS_DETAIL_ROUTE = "listadoJ/{equipoID}"
+private const val CALENDARIO_PARTIDO_DETAILS_ROUTE = "calendario/partido/{matchId}"
+private const val GRUPOS_PARTIDO_DETAILS_ROUTE = "grupos/partido/{matchId}"
 
 @Composable
 fun AppNavHost(
@@ -46,35 +48,47 @@ fun AppNavHost(
             val jornada = backStackEntry.arguments?.getInt("jornada") ?: 1
             CalendarioScreen(
                 onPartidoClick = { matchId ->
-                    navController.navigate("partido_details/$matchId")
+                    navController.navigate("calendario/partido/$matchId")
                 },
                 initialJornada = jornada
             )
         }
 
-        composable(Screen.Grupos.route) {
-            GruposScreen()
-        }
-
-
-        equiposGraph(navController)
-
         composable(
-            route = "partido_details/{matchId}",
+            route = CALENDARIO_PARTIDO_DETAILS_ROUTE,
             arguments = listOf(navArgument("matchId") { type = NavType.IntType })
         ) { backStackEntry ->
             val matchId = backStackEntry.arguments?.getInt("matchId") ?: 1
             PartidoDetailsScreen(
-                onBackClick = { matchId ->
-                    // Obtener la jornada del partido y navegar de vuelta
-                    val jornada = com.example.dragonstats.data.model.CalendarioData
-                        .obtenerEncuentroPorId(matchId)?.jornada ?: 1
-                    navController.navigate(Screen.Calendario.createRoute(jornada)) {
-                        popUpTo(Screen.Calendario.createRoute(1)) { inclusive = true }
-                    }
+                onBackClick = { navController.popBackStack() },
+                matchId = matchId
+            )
+        }
+
+        gruposGraph(navController)
+
+        equiposGraph(navController)
+    }
+}
+
+fun NavGraphBuilder.gruposGraph(navController: NavHostController) {
+    navigation(startDestination = Screen.Grupos.route, route = "grupos_graph") {
+        composable(Screen.Grupos.route) {
+            GruposScreen(navController = navController)
+        }
+        composable(
+            route = GRUPOS_PARTIDO_DETAILS_ROUTE,
+            arguments = listOf(navArgument("matchId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val matchId = backStackEntry.arguments?.getInt("matchId") ?: 1
+            PartidoDetailsScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 },
                 matchId = matchId
             )
+        }
+    }
 }
 
 fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
@@ -89,7 +103,7 @@ fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
             arguments = listOf(navArgument("equipoID") { type = NavType.IntType })
         ) { backStackEntry ->
             val equipoId = backStackEntry.arguments?.getInt("equipoID") ?: 0
-            ListadoScreen(equipoId, navController)
+            ListadoScreen(e = equipoId, navController = navController)
         }
     }
 }

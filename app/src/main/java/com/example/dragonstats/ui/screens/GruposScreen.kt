@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.dragonstats.R
 import com.example.dragonstats.ui.screens.tabs.BracketStageTab
 import com.example.dragonstats.ui.screens.tabs.FaseGruposTab
@@ -37,6 +38,7 @@ enum class GruposTab {
 
 @Composable
 fun GruposScreen(
+    navController: NavController,
     viewModel: GruposViewModel = viewModel()
 ) {
     var selectedTab by remember { mutableStateOf(GruposTab.FASE_GRUPOS) }
@@ -47,17 +49,15 @@ fun GruposScreen(
             .background(Color.Black)
             .padding(top = 24.dp)
     ) {
-        // Custom Tab Row
         CustomTabRow(
             selectedTab = selectedTab,
             onTabSelected = { selectedTab = it },
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
         )
 
-        // Tab Content - Pasar el viewModel a ambas tabs
         when (selectedTab) {
             GruposTab.FASE_GRUPOS -> FaseGruposTab(viewModel = viewModel)
-            GruposTab.BRACKET_STAGE -> BracketStageTab(viewModel = viewModel)
+            GruposTab.BRACKET_STAGE -> BracketStageTab(viewModel = viewModel, navController = navController)
         }
     }
 }
