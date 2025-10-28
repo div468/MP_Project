@@ -1,6 +1,6 @@
 package com.example.dragonstats.ui.screens.tabs
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -51,27 +50,31 @@ import com.example.dragonstats.ui.viewmodel.GruposViewModel
 
 @Composable
 fun TeamBox(team: Equipo) {
+    val words = team.nombre.split(' ').filter { it.isNotEmpty() }
+    val initials = if (words.size == 2) {
+        (words[0].take(1) + words[1].take(2)).uppercase()
+    } else {
+        team.nombre.take(3).uppercase()
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.width(40.dp)
     ) {
         Box(
-            modifier = Modifier.size(30.dp)
-        ){
-            Image(
-                painter = painterResource(id = team.shield),
-                contentDescription = "Team Shield",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(36.dp)
+                .background(Color(0xFF333333), shape = RoundedCornerShape(18.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = initials,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = if (team.nombre.length >= 3) team.nombre.substring(0,3).uppercase() else team.nombre.uppercase(),
-            style = MaterialTheme.typography.labelSmall,
-            fontSize = 10.sp,
-            maxLines = 1
-        )
     }
 }
 
@@ -87,6 +90,7 @@ fun MatchCard(match: Match, modifier: Modifier) {
             containerColor = colorResource(id = R.color.dark_gray)
         )
     ) {
+        Spacer(modifier = Modifier.height(8.dp))
         Column(
             modifier = Modifier.fillMaxSize().padding(6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,7 +98,7 @@ fun MatchCard(match: Match, modifier: Modifier) {
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ){
                 TeamBox(team = match.teamA)
                 TeamBox(team = match.teamB)
@@ -228,16 +232,11 @@ private fun BracketContent(
     viewModel: GruposViewModel,
     topTeams: List<Equipo>
 ) {
-    val octavos = viewModel.createOctavos(topTeams)
-    val quarterFinals = viewModel.createQuarterFinals()
+    val quarterFinals = viewModel.createQuarterFinals(topTeams)
     val semiFinals = viewModel.createSemiFinals()
     val finalMatch = viewModel.createFinal()
 
     val topRounds = listOf(
-        Round(
-            phase = stringResource(id = R.string.header_phase1),
-            matches = octavos.take(4),
-        ),
         Round(
             phase = stringResource(id = R.string.header_phase2),
             matches = quarterFinals.take(2),
@@ -256,10 +255,6 @@ private fun BracketContent(
         Round(
             phase = stringResource(id = R.string.header_phase2),
             matches = quarterFinals.drop(2),
-        ),
-        Round(
-            phase = stringResource(id = R.string.header_phase1),
-            matches = octavos.drop(4),
         )
     )
 

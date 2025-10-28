@@ -6,7 +6,6 @@ import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Grupo
 import com.example.dragonstats.data.model.Match
 import com.example.dragonstats.data.repository.EquipoRepository
-import com.example.dragonstats.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,113 +13,67 @@ import kotlinx.coroutines.launch
 
 sealed class GruposUiState {
     object Loading : GruposUiState()
-    data class Success(
-        val grupos: List<Grupo>,
-        val topTeams: List<Equipo> = emptyList()
-    ) : GruposUiState()
+    data class Success(val grupos: List<Grupo>, val topTeams: List<Equipo>) : GruposUiState()
     data class Error(val message: String) : GruposUiState()
 }
 
-class GruposViewModel(
-    private val repository: EquipoRepository = EquipoRepository()
-) : ViewModel() {
+class GruposViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<GruposUiState>(GruposUiState.Loading)
     val uiState: StateFlow<GruposUiState> = _uiState.asStateFlow()
 
+    private val repository = EquipoRepository()
+
     init {
-        loadGrupos()
+        fetchGrupos()
     }
 
-    fun loadGrupos() {
+    private fun fetchGrupos() {
         viewModelScope.launch {
             _uiState.value = GruposUiState.Loading
-
-            repository.getGrupos()
-                .onSuccess { grupos ->
-                    // Obtener los top 16 equipos para el bracket
-                    val topTeams = grupos.flatMap { it.equipos.take(2) }.take(16)
-                    _uiState.value = GruposUiState.Success(
-                        grupos = grupos,
-                        topTeams = topTeams
-                    )
-                }
-                .onFailure { exception ->
-                    _uiState.value = GruposUiState.Error(
-                        exception.message ?: "Error desconocido al cargar los grupos"
-                    )
-                }
+            repository.getGrupos().onSuccess { grupos ->
+                val topTeams = grupos.flatMap { it.equipos.take(2) }
+                _uiState.value = GruposUiState.Success(grupos, topTeams)
+            }.onFailure { exception ->
+                _uiState.value = GruposUiState.Error(exception.message ?: "Unknown error")
+            }
         }
     }
 
     fun retry() {
-        loadGrupos()
+        fetchGrupos()
     }
 
-    // Funciones para crear los matches del bracket
-    fun createOctavos(topTeams: List<Equipo>): List<Match> {
-        return if (topTeams.size >= 16) {
-            listOf(
-                Match(topTeams[0], topTeams[15], "0 - 0"),
-                Match(topTeams[1], topTeams[14], "0 - 0"),
-                Match(topTeams[2], topTeams[13], "0 - 0"),
-                Match(topTeams[3], topTeams[12], "0 - 0"),
-                Match(topTeams[4], topTeams[11], "0 - 0"),
-                Match(topTeams[5], topTeams[10], "0 - 0"),
-                Match(topTeams[6], topTeams[9], "0 - 0"),
-                Match(topTeams[7], topTeams[8], "0 - 0")
-            )
-        } else {
-            createDummyMatches(8)
-        }
-    }
+    fun createQuarterFinals(topTeams: List<Equipo>): List<Match> {
+        val teamsByGroup = topTeams.groupBy { it.grupo }
 
-    fun createQuarterFinals(): List<Match> {
+        val teamA1 = teamsByGroup["A"]?.getOrNull(0) ?: Equipo(nombre = "A1")
+        val teamA2 = teamsByGroup["A"]?.getOrNull(1) ?: Equipo(nombre = "A2")
+        val teamB1 = teamsByGroup["B"]?.getOrNull(0) ?: Equipo(nombre = "B1")
+        val teamB2 = teamsByGroup["B"]?.getOrNull(1) ?: Equipo(nombre = "B2")
+        val teamC1 = teamsByGroup["C"]?.getOrNull(0) ?: Equipo(nombre = "C1")
+        val teamC2 = teamsByGroup["C"]?.getOrNull(1) ?: Equipo(nombre = "C2")
+        val teamD1 = teamsByGroup["D"]?.getOrNull(0) ?: Equipo(nombre = "D1")
+        val teamD2 = teamsByGroup["D"]?.getOrNull(1) ?: Equipo(nombre = "D2")
+
         return listOf(
-            Match(createDummyTeam("Ganador O1"), createDummyTeam("Ganador O2"), "0 - 0"),
-            Match(createDummyTeam("Ganador O3"), createDummyTeam("Ganador O4"), "0 - 0"),
-            Match(createDummyTeam("Ganador O5"), createDummyTeam("Ganador O6"), "0 - 0"),
-            Match(createDummyTeam("Ganador O7"), createDummyTeam("Ganador O8"), "0 - 0")
+            Match(teamA1, teamD2, "0-0"),
+            Match(teamC1, teamB2, "0-0"),
+            Match(teamB1, teamC2, "0-0"),
+            Match(teamD1, teamA2, "0-0"),
         )
     }
 
     fun createSemiFinals(): List<Match> {
+        val placeholder = Equipo(nombre = "TBD")
         return listOf(
-            Match(createDummyTeam("Ganador QF1"), createDummyTeam("Ganador QF2"), "0 - 0"),
-            Match(createDummyTeam("Ganador QF3"), createDummyTeam("Ganador QF4"), "0 - 0")
+            Match(placeholder, placeholder, "0-0"),
+            Match(placeholder, placeholder, "0-0")
         )
     }
 
     fun createFinal(): Match {
-        return Match(
-            createDummyTeam("Ganador SF1"),
-            createDummyTeam("Ganador SF2"),
-            "0 - 0"
-        )
-    }
-
-    private fun createDummyMatches(count: Int): List<Match> {
-        return List(count) { index ->
-            Match(
-                createDummyTeam("Equipo ${index * 2 + 1}"),
-                createDummyTeam("Equipo ${index * 2 + 2}"),
-                "0 - 0"
-            )
-        }
-    }
-
-    private fun createDummyTeam(name: String): Equipo {
-        return Equipo(
-            id = 0,
-            nombre = name,
-            empatados = 0,
-            ganados = 0,
-            golesContra = 0,
-            golesFavor = 0,
-            perdidos = 0,
-            puntos = 0,
-            grupo = "",
-            shield = R.drawable.default_shield
-        )
+        val placeholder = Equipo(nombre = "TBD")
+        return Match(placeholder, placeholder, "0-0")
     }
 }

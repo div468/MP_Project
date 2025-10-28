@@ -11,8 +11,7 @@ data class Equipo(
     val golesFavor: Int = 0,
     val perdidos: Int = 0,
     val puntos: Int = 0,
-    val grupo: String = "",
-    val shield: Int = R.drawable.default_shield
+    val grupo: String = ""
 ) {
 
     val partidos: Int
