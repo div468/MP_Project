@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,13 +27,12 @@ import com.example.dragonstats.data.model.Encuentro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartidoDetailsScreen(
-    onBackClick: () -> Unit = {},
-    matchId: Int = 1 // Valor por defecto para compatibilidad
+    onBackClick: (Int) -> Unit = {},
+    matchId: Int = 1
 ) {
     val encuentro = CalendarioData.obtenerEncuentroPorId(matchId)
 
     if (encuentro == null) {
-        // Si no se encuentra el partido, mostrar error
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -43,7 +40,7 @@ fun PartidoDetailsScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = R.string.partido_no_encontrado.toString(),
+                text = "Partido no encontrado",
                 color = Color.White,
                 fontSize = 18.sp
             )
@@ -56,33 +53,24 @@ fun PartidoDetailsScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Barra de navegación superior similar a la segunda imagen
+        // Barra de navegación superior con label de jornada
         TopAppBar(
-            title = { },
+            title = {
+                Text(
+                    text = "Jornada ${encuentro.jornada}",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
             navigationIcon = {
                 IconButton(
-                    onClick = onBackClick,
+                    onClick = { onBackClick(matchId) } ,
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Regresar",
-                        tint = Color.White
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorito",
-                        tint = Color.White
-                    )
-                }
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Más opciones",
                         tint = Color.White
                     )
                 }
@@ -135,15 +123,14 @@ fun PartidoDetailsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (encuentro.hora != null || encuentro.resultado != null) R.string.proximo_partido.toString() else R.string.partido_pendiente.toString(),
+                            text = if (encuentro.hora != null) "Próximo partido" else "Partido pendiente",
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium
                         )
-                        if (encuentro.hora != null || encuentro.resultado != null) {
-                            val horaDisplay = encuentro.hora ?: encuentro.resultado ?: ""
+                        if (encuentro.hora != null) {
                             Text(
-                                text = "${encuentro.fecha} - $horaDisplay",
+                                text = "${encuentro.fecha} - ${encuentro.hora}",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
@@ -173,8 +160,7 @@ private fun MatchHeader(
                 fontWeight = FontWeight.Bold
             )
         } else {
-            // Mostrar hora del campo `hora` o `resultado`, sino "--:--"
-            val horaDisplay = encuentro.hora ?: encuentro.resultado ?: "--:--"
+            val horaDisplay = encuentro.hora ?: "--:--"
             Text(
                 text = horaDisplay,
                 color = Color.White,
