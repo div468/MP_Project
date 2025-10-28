@@ -58,9 +58,9 @@ fun ListadoScreen (e: Int, navController: NavController){
                 modifier = Modifier.fillMaxWidth().height(25.dp)
                     .background(Color.Transparent),
 
-            ){
+                ){
                 IconButton(
-                    onClick = {navController.navigate("equipos")},
+                    onClick = { navController.popBackStack() },
                     modifier = Modifier.height(18.dp)
                 ) {
                     Icon(

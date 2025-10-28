@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.dragonstats.R
 import com.example.dragonstats.ui.navigation.Screen
@@ -24,31 +25,33 @@ data class BottomNavItem(
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        BottomNavItem(Screen.Calendario, R.drawable.ic_calendar, R.string.app_name),
-        BottomNavItem(Screen.Grupos, R.drawable.ic_schedule, R.string.app_name),
-        BottomNavItem(Screen.Equipos, R.drawable.ic_teams, R.string.app_name)
+        BottomNavItem(Screen.Calendario, R.drawable.ic_calendar, R.string.nav_calendario),
+        BottomNavItem(Screen.Grupos, R.drawable.ic_schedule, R.string.nav_grupos),
+        BottomNavItem(Screen.EquiposGraph, R.drawable.ic_teams, R.string.nav_equipos)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
         containerColor = Color(0xFF4CAF50) // green_primary
     ) {
         items.forEach { item ->
+            val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
+
             NavigationBarItem(
                 icon = {
                     Icon(
                         painter = painterResource(id = item.iconRes),
-                        contentDescription = item.screen.title
+                        contentDescription = stringResource(id = item.titleRes)
                     )
                 },
                 label = {
-                    Text(text = item.screen.title)
+                    Text(text = stringResource(id = item.titleRes))
                 },
-                selected = currentRoute == item.screen.route,
+                selected = isSelected,
                 onClick = {
-                    if (currentRoute != item.screen.route) {
+                    if (currentDestination?.route != item.screen.route) {
                         navController.navigate(item.screen.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
