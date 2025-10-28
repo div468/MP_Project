@@ -40,10 +40,9 @@ import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.TorneoData
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 
 @Composable
-fun EquiposScreen(navController: NavController) {
+fun EquiposScreen(onEquipoClick: (Int) -> Unit) {
     val equipos = TorneoData.obtenerEquiposOrdenados()
     var equiposFavoritos by remember { mutableStateOf(setOf<String>()) }
 
@@ -81,7 +80,7 @@ fun EquiposScreen(navController: NavController) {
                         }
                     },
                     onVerJugadores = {
-                        navController.navigate("listadoJ/${equipo.id}")
+                        onEquipoClick(equipo.id)
                     }
                 )
             }

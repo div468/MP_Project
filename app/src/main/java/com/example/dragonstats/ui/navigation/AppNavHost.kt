@@ -2,26 +2,29 @@ package com.example.dragonstats.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.example.dragonstats.ui.screens.CalendarioScreen
 import com.example.dragonstats.ui.screens.EquiposScreen
 import com.example.dragonstats.ui.screens.GruposScreen
-import com.example.dragonstats.ui.screens.PartidoDetailsScreen
 import com.example.dragonstats.ui.screens.ListadoScreen
+import com.example.dragonstats.ui.screens.PartidoDetailsScreen
 
 sealed class Screen(val route: String, val title: String) {
     object Calendario : Screen("calendario/{jornada}", "Calendario") {
         fun createRoute(jornada: Int = 1) = "calendario/$jornada"
     }
     object Grupos : Screen("grupos", "Grupos")
-    object Equipos : Screen("equipos", "Equipos")
-    object PartidoDetails : Screen("partido_details/{matchId}", "Partido Details")
-    object ListadoJ: Screen("listadoJ/{equipoID}", "Listado Jugadores")
+    object EquiposGraph : Screen("equipos_graph", "Equipos")
 }
+
+private const val EQUIPOS_LIST_ROUTE = "equipos_list"
+private const val EQUIPOS_DETAIL_ROUTE = "listadoJ/{equipoID}"
 
 @Composable
 fun AppNavHost(
@@ -53,14 +56,8 @@ fun AppNavHost(
             GruposScreen()
         }
 
-        composable(Screen.Equipos.route) {
-            EquiposScreen(navController)
-        }
 
-        composable(Screen.ListadoJ.route, listOf(navArgument("equipoID") { type = NavType.IntType })){backStackEntry ->
-            val equipoId = backStackEntry.arguments?.getInt("equipoID") ?: 0
-            ListadoScreen(equipoId,navController)
-        }
+        equiposGraph(navController)
 
         composable(
             route = "partido_details/{matchId}",
@@ -78,6 +75,21 @@ fun AppNavHost(
                 },
                 matchId = matchId
             )
+}
+
+fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
+    navigation(startDestination = EQUIPOS_LIST_ROUTE, route = Screen.EquiposGraph.route) {
+        composable(EQUIPOS_LIST_ROUTE) {
+            EquiposScreen(onEquipoClick = { equipoId ->
+                navController.navigate("listadoJ/$equipoId")
+            })
+        }
+        composable(
+            route = EQUIPOS_DETAIL_ROUTE,
+            arguments = listOf(navArgument("equipoID") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val equipoId = backStackEntry.arguments?.getInt("equipoID") ?: 0
+            ListadoScreen(equipoId, navController)
         }
     }
 }

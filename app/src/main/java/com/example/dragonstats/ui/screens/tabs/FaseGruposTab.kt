@@ -169,7 +169,7 @@ private fun GrupoCard(grupo: Grupo) {
             ) {
                 // Nombre del grupo
                 Text(
-                    text = grupo.nombre,
+                    text = stringResource(id = R.string.grupo, ) + " " + grupo.nombre,
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,

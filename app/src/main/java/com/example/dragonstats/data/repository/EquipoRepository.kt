@@ -43,7 +43,7 @@ class EquipoRepository {
                 if (equipos.isNotEmpty()) {
                     grupos.add(
                         Grupo(
-                            nombre = "Grupo $grupoNombre",
+                            nombre = grupoNombre,
                             equipos = equipos.sortedWith(
                                 compareByDescending<Equipo> { it.puntos }
                                     .thenByDescending { it.golDiferencia }
