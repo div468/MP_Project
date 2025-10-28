@@ -36,6 +36,13 @@ fun BottomNavigationBar(navController: NavController) {
         containerColor = Color(0xFF4CAF50) // green_primary
     ) {
         items.forEach { item ->
+            val isCalendario = item.screen == Screen.Calendario
+            val isSelected = if (isCalendario) {
+                currentRoute?.startsWith("calendario") == true
+            } else {
+                currentRoute == item.screen.route
+            }
+
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -46,10 +53,16 @@ fun BottomNavigationBar(navController: NavController) {
                 label = {
                     Text(text = item.screen.title)
                 },
-                selected = currentRoute == item.screen.route,
+                selected = isSelected,
                 onClick = {
-                    if (currentRoute != item.screen.route) {
-                        navController.navigate(item.screen.route) {
+                    if (!isSelected) {
+                        val route = if (isCalendario) {
+                            Screen.Calendario.createRoute(1)
+                        } else {
+                            item.screen.route
+                        }
+
+                        navController.navigate(route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }

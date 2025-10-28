@@ -14,7 +14,9 @@ import com.example.dragonstats.ui.screens.PartidoDetailsScreen
 import com.example.dragonstats.ui.screens.ListadoScreen
 
 sealed class Screen(val route: String, val title: String) {
-    object Calendario : Screen("calendario", "Calendario")
+    object Calendario : Screen("calendario/{jornada}", "Calendario") {
+        fun createRoute(jornada: Int = 1) = "calendario/$jornada"
+    }
     object Grupos : Screen("grupos", "Grupos")
     object Equipos : Screen("equipos", "Equipos")
     object PartidoDetails : Screen("partido_details/{matchId}", "Partido Details")
@@ -28,13 +30,23 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Calendario.route,
+        startDestination = Screen.Calendario.createRoute(1),
         modifier = modifier
     ) {
-        composable(Screen.Calendario.route) {
-            CalendarioScreen(onPartidoClick = { matchId ->
-                navController.navigate("partido_details/$matchId")
+        composable(
+            route = "calendario/{jornada}",
+            arguments = listOf(navArgument("jornada") {
+                type = NavType.IntType
+                defaultValue = 1
             })
+        ) { backStackEntry ->
+            val jornada = backStackEntry.arguments?.getInt("jornada") ?: 1
+            CalendarioScreen(
+                onPartidoClick = { matchId ->
+                    navController.navigate("partido_details/$matchId")
+                },
+                initialJornada = jornada
+            )
         }
 
         composable(Screen.Grupos.route) {
@@ -56,9 +68,12 @@ fun AppNavHost(
         ) { backStackEntry ->
             val matchId = backStackEntry.arguments?.getInt("matchId") ?: 1
             PartidoDetailsScreen(
-                onBackClick = {
-                    navController.navigate(Screen.Calendario.route) {
-                        popUpTo(Screen.Calendario.route) { inclusive = true }
+                onBackClick = { matchId ->
+                    // Obtener la jornada del partido y navegar de vuelta
+                    val jornada = com.example.dragonstats.data.model.CalendarioData
+                        .obtenerEncuentroPorId(matchId)?.jornada ?: 1
+                    navController.navigate(Screen.Calendario.createRoute(jornada)) {
+                        popUpTo(Screen.Calendario.createRoute(1)) { inclusive = true }
                     }
                 },
                 matchId = matchId

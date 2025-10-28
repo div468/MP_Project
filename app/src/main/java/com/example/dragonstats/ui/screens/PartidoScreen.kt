@@ -27,7 +27,7 @@ import com.example.dragonstats.data.model.Encuentro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartidoDetailsScreen(
-    onBackClick: () -> Unit = {},
+    onBackClick: (Int) -> Unit = {},
     matchId: Int = 1
 ) {
     val encuentro = CalendarioData.obtenerEncuentroPorId(matchId)
@@ -59,13 +59,13 @@ fun PartidoDetailsScreen(
                 Text(
                     text = "Jornada ${encuentro.jornada}",
                     color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
                 )
             },
             navigationIcon = {
                 IconButton(
-                    onClick = onBackClick,
+                    onClick = { onBackClick(matchId) } ,
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
                     Icon(

@@ -28,9 +28,12 @@ import com.example.dragonstats.data.model.Encuentro
 import com.example.dragonstats.data.model.CalendarioData
 
 @Composable
-fun CalendarioScreen(onPartidoClick: (Int) -> Unit) {
+fun CalendarioScreen(
+    onPartidoClick: (Int) -> Unit,
+    initialJornada: Int = 1
+) {
     val jornadas = CalendarioData.obtenerEncuentros()
-    var selectedJornada by remember { mutableIntStateOf(1) }
+    var selectedJornada by remember { mutableIntStateOf(initialJornada) }
 
     Column(
         modifier = Modifier
