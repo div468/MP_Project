@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,12 +24,72 @@ import com.example.dragonstats.data.model.PlayerEvent
 import com.example.dragonstats.data.model.EventType
 import com.example.dragonstats.data.model.Team
 import com.example.dragonstats.data.model.Encuentro
+import com.example.dragonstats.ui.viewmodel.PartidoUiState
+import com.example.dragonstats.ui.viewmodel.PartidoViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartidoDetailsScreen(
     onBackClick: (Int) -> Unit = {},
-    matchId: Int = 1
+    matchId: Int = 1,
+    viewModel: PartidoViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(matchId) {
+        viewModel.loadPartido(matchId)
+    }
+
+    when (val state = uiState) {
+        is PartidoUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color(0xFF4CAF50))
+            }
+        }
+        is PartidoUiState.Error -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = state.message,
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { viewModel.retry() }) {
+                        Text("Reintentar")
+                    }
+                }
+            }
+        }
+        is PartidoUiState.Success -> {
+            PartidoDetailsContent(
+                encuentro = state.encuentro,
+                onBackClick = onBackClick,
+                matchId = matchId
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PartidoDetailsContent(
+    encuentro: Encuentro,
+    onBackClick: (Int) -> Unit,
+    matchId: Int
 ) {
     val encuentro = CalendarioData.obtenerEncuentroPorId(matchId)
 
