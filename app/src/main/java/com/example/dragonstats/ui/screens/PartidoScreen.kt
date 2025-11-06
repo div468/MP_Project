@@ -18,8 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.dragonstats.R
-import com.example.dragonstats.data.model.CalendarioData
 import com.example.dragonstats.data.model.PlayerEvent
 import com.example.dragonstats.data.model.EventType
 import com.example.dragonstats.data.model.Team
@@ -91,30 +89,12 @@ private fun PartidoDetailsContent(
     onBackClick: (Int) -> Unit,
     matchId: Int
 ) {
-    val encuentro = CalendarioData.obtenerEncuentroPorId(matchId)
-
-    if (encuentro == null) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Partido no encontrado",
-                color = Color.White,
-                fontSize = 18.sp
-            )
-        }
-        return
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Barra de navegación superior con label de jornada
+        // Barra de navegación superior con label de jornada (ahora muestra la jornada correcta del encuentro)
         TopAppBar(
             title = {
                 Text(

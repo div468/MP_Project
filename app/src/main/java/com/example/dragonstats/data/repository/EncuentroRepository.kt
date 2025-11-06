@@ -16,7 +16,6 @@ class EncuentroRepository {
         return try {
             Log.d(TAG, "=== INICIO: Buscando encuentros para Jornada $jornada ===")
 
-            // Obtener el documento de la jornada
             val jornadaDoc = db.collection("tournaments")
                 .document("2025")
                 .collection("jornadas")
@@ -31,7 +30,6 @@ class EncuentroRepository {
 
             Log.d(TAG, "Documento de Jornada encontrado: ${jornadaDoc.id}")
 
-            // Obtener el array de encuentros
             val encuentrosArray = jornadaDoc.get("encuentros") as? List<Map<String, Any>>
 
             if (encuentrosArray == null) {
@@ -41,7 +39,9 @@ class EncuentroRepository {
 
             Log.d(TAG, "Encuentros encontrados en array: ${encuentrosArray.size}")
 
-            // Parsear cada encuentro del array
+            // Generar ID único: jornada * 100 + índice
+            // Ej: Jornada 1, índice 0 → ID 100
+            // Ej: Jornada 2, índice 0 → ID 200
             val encuentros = encuentrosArray.mapIndexedNotNull { index, encuentroMap ->
                 try {
                     Log.d(TAG, "--- Procesando encuentro $index ---")
@@ -55,11 +55,13 @@ class EncuentroRepository {
 
                     Log.d(TAG, "equipo1: $equipo1 vs equipo2: $equipo2 ($goles1-$goles2)")
 
-                    // Parsear eventos si existen
                     val eventos = parseEventos(encuentroMap["eventos"])
 
+                    // ID único: jornada * 100 + índice
+                    val uniqueId = (jornada * 100) + index
+
                     Encuentro(
-                        id = index,
+                        id = uniqueId,
                         equipo1 = equipo1,
                         equipo2 = equipo2,
                         fecha = fecha,
@@ -92,65 +94,67 @@ class EncuentroRepository {
         return try {
             Log.d(TAG, "=== Buscando encuentro con ID: $id ===")
 
-            val jornadasList = listOf(1, 2, 3, 4, 5)
+            // Extraer jornada e índice del ID único
+            // ID 205 → jornada 2, índice 5
+            val jornada = id / 100
+            val index = id % 100
 
-            for (jornada in jornadasList) {
-                try {
-                    Log.d(TAG, "Buscando en Jornada $jornada")
+            Log.d(TAG, "ID $id decodificado → Jornada: $jornada, Índice: $index")
 
-                    val jornadaDoc = db.collection("tournaments")
-                        .document("2025")
-                        .collection("jornadas")
-                        .document("Jornada $jornada")
-                        .get()
-                        .await()
-
-                    if (!jornadaDoc.exists()) {
-                        continue
-                    }
-
-                    // Obtener el array de encuentros
-                    val encuentrosArray = jornadaDoc.get("encuentros") as? List<Map<String, Any>>
-
-                    if (encuentrosArray == null) {
-                        continue
-                    }
-
-                    // Buscar el encuentro por índice
-                    if (id >= 0 && id < encuentrosArray.size) {
-                        val encuentroMap = encuentrosArray[id]
-
-                        Log.d(TAG, "✅ Encuentro encontrado en Jornada $jornada, índice $id")
-
-                        val goles1 = (encuentroMap["goles1"] as? Long)?.toInt()
-                        val goles2 = (encuentroMap["goles2"] as? Long)?.toInt()
-
-                        // Parsear eventos
-                        val eventos = parseEventos(encuentroMap["eventos"])
-
-                        val encuentro = Encuentro(
-                            id = id,
-                            equipo1 = encuentroMap["equipo1_id"] as? String ?: "",
-                            equipo2 = encuentroMap["equipo2_id"] as? String ?: "",
-                            fecha = encuentroMap["date"] as? String ?: "POR DEFINIR",
-                            hora = encuentroMap["hora"] as? String,
-                            resultado = if (goles1 != null && goles2 != null) "$goles1-$goles2" else null,
-                            jornada = jornada,
-                            golesEquipo1 = goles1,
-                            golesEquipo2 = goles2,
-                            eventos = eventos,
-                            grupo = encuentroMap["grupo"] as? String ?: ""
-                        )
-
-                        return Result.success(encuentro)
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error en Jornada $jornada: ${e.message}")
-                }
+            if (jornada < 1 || jornada > 10) {
+                Log.w(TAG, "⚠️ Jornada inválida: $jornada")
+                return Result.success(null)
             }
 
-            Log.w(TAG, "⚠️ Encuentro no encontrado en ninguna jornada")
-            Result.success(null)
+            val jornadaDoc = db.collection("tournaments")
+                .document("2025")
+                .collection("jornadas")
+                .document("Jornada $jornada")
+                .get()
+                .await()
+
+            if (!jornadaDoc.exists()) {
+                Log.w(TAG, "⚠️ Jornada $jornada no existe")
+                return Result.success(null)
+            }
+
+            val encuentrosArray = jornadaDoc.get("encuentros") as? List<Map<String, Any>>
+
+            if (encuentrosArray == null) {
+                Log.w(TAG, "⚠️ No hay encuentros en Jornada $jornada")
+                return Result.success(null)
+            }
+
+            // Buscar el encuentro por índice
+            if (index < 0 || index >= encuentrosArray.size) {
+                Log.w(TAG, "⚠️ Índice $index fuera de rango (tamaño: ${encuentrosArray.size})")
+                return Result.success(null)
+            }
+
+            val encuentroMap = encuentrosArray[index]
+
+            Log.d(TAG, "✅ Encuentro encontrado en Jornada $jornada, índice $index")
+
+            val goles1 = (encuentroMap["goles1"] as? Long)?.toInt()
+            val goles2 = (encuentroMap["goles2"] as? Long)?.toInt()
+
+            val eventos = parseEventos(encuentroMap["eventos"])
+
+            val encuentro = Encuentro(
+                id = id,
+                equipo1 = encuentroMap["equipo1_id"] as? String ?: "",
+                equipo2 = encuentroMap["equipo2_id"] as? String ?: "",
+                fecha = encuentroMap["date"] as? String ?: "POR DEFINIR",
+                hora = encuentroMap["hora"] as? String,
+                resultado = if (goles1 != null && goles2 != null) "$goles1-$goles2" else null,
+                jornada = jornada,
+                golesEquipo1 = goles1,
+                golesEquipo2 = goles2,
+                eventos = eventos,
+                grupo = encuentroMap["grupo"] as? String ?: ""
+            )
+
+            Result.success(encuentro)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error crítico buscando encuentro: ${e.message}")
             e.printStackTrace()
@@ -162,7 +166,7 @@ class EncuentroRepository {
         return try {
             Log.d(TAG, "=== Calculando total de jornadas ===")
 
-            val jornadasList = listOf(1, 2, 3, 4, 5)
+            val jornadasList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             var totalJornadas = 0
 
             for (jornada in jornadasList) {
