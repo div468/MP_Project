@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -40,10 +43,24 @@ fun CalendarioScreen(
 ) {
     var selectedJornada by rememberSaveable { mutableIntStateOf(initialJornada) }
     val uiState by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     // Cargar la jornada inicial cuando la pantalla se monta
     LaunchedEffect(Unit) {
         viewModel.loadEncuentros(initialJornada)
+    }
+
+    // Función para hacer scroll a la jornada seleccionada
+    fun scrollToJornada(jornada: Int, totalJornadas: Int) {
+        coroutineScope.launch {
+            val index = if (jornada <= totalJornadas) {
+                jornada - 1 // Jornadas regulares
+            } else {
+                totalJornadas + (jornada - totalJornadas - 1) // Fases finales
+            }
+            listState.animateScrollToItem(index)
+        }
     }
 
     Column(
@@ -68,12 +85,14 @@ fun CalendarioScreen(
             is CalendarioUiState.Success -> {
                 // Navbar horizontal
                 LazyRow(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
+                    // Jornadas regulares
                     items(state.totalJornadas) { index ->
                         val jornadaNum = index + 1
                         JornadaTab(
@@ -82,6 +101,47 @@ fun CalendarioScreen(
                             onClick = {
                                 selectedJornada = jornadaNum
                                 viewModel.loadEncuentros(jornadaNum)
+                                scrollToJornada(jornadaNum, state.totalJornadas)
+                            }
+                        )
+                    }
+
+                    // Fases finales (después de las jornadas regulares)
+                    item {
+                        FaseTab(
+                            fase = "Cuartos",
+                            jornadaValue = state.totalJornadas + 1,
+                            isSelected = selectedJornada == state.totalJornadas + 1,
+                            onClick = {
+                                selectedJornada = state.totalJornadas + 1
+                                viewModel.loadEncuentros(state.totalJornadas + 1)
+                                scrollToJornada(state.totalJornadas + 1, state.totalJornadas)
+                            }
+                        )
+                    }
+
+                    item {
+                        FaseTab(
+                            fase = "Semifinal",
+                            jornadaValue = state.totalJornadas + 2,
+                            isSelected = selectedJornada == state.totalJornadas + 2,
+                            onClick = {
+                                selectedJornada = state.totalJornadas + 2
+                                viewModel.loadEncuentros(state.totalJornadas + 2)
+                                scrollToJornada(state.totalJornadas + 2, state.totalJornadas)
+                            }
+                        )
+                    }
+
+                    item {
+                        FaseTab(
+                            fase = "Final",
+                            jornadaValue = state.totalJornadas + 3,
+                            isSelected = selectedJornada == state.totalJornadas + 3,
+                            onClick = {
+                                selectedJornada = state.totalJornadas + 3
+                                viewModel.loadEncuentros(state.totalJornadas + 3)
+                                scrollToJornada(state.totalJornadas + 3, state.totalJornadas)
                             }
                         )
                     }
@@ -224,6 +284,34 @@ private fun JornadaTab(
     ) {
         Text(
             text = "Jornada $jornadaNumero",
+            color = textColor,
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+private fun FaseTab(
+    fase: String,
+    jornadaValue: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) Color(0xFFFFD700) else Color(0xFF1A1A1A)
+    val textColor = if (isSelected) Color.Black else Color.Gray
+
+    Box(
+        modifier = Modifier
+            .height(40.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(backgroundColor)
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = fase,
             color = textColor,
             fontSize = 14.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal

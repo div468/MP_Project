@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 fun PartidoDetailsScreen(
     onBackClick: (Int) -> Unit = {},
     matchId: Int = 1,
+    totalJornadas: Int = 5, // Pasar desde la navegación
     viewModel: PartidoViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -76,9 +77,20 @@ fun PartidoDetailsScreen(
             PartidoDetailsContent(
                 encuentro = state.encuentro,
                 onBackClick = onBackClick,
-                matchId = matchId
+                matchId = matchId,
+                totalJornadas = totalJornadas
             )
         }
+    }
+}
+
+// Función helper para obtener el nombre de la fase
+private fun getFaseNombre(jornada: Int, totalJornadas: Int): String {
+    return when (jornada) {
+        totalJornadas + 1 -> "Cuartos de Final"
+        totalJornadas + 2 -> "Semifinal"
+        totalJornadas + 3 -> "Final"
+        else -> "Jornada $jornada"
     }
 }
 
@@ -87,18 +99,19 @@ fun PartidoDetailsScreen(
 private fun PartidoDetailsContent(
     encuentro: Encuentro,
     onBackClick: (Int) -> Unit,
-    matchId: Int
+    matchId: Int,
+    totalJornadas: Int
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Barra de navegación superior con label de jornada (ahora muestra la jornada correcta del encuentro)
+        // Barra de navegación superior con label de jornada o fase
         TopAppBar(
             title = {
                 Text(
-                    text = "Jornada ${encuentro.jornada}",
+                    text = getFaseNombre(encuentro.jornada, totalJornadas),
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
