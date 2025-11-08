@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,47 +18,100 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.dragonstats.R
-import com.example.dragonstats.data.model.CalendarioData
 import com.example.dragonstats.data.model.PlayerEvent
 import com.example.dragonstats.data.model.EventType
 import com.example.dragonstats.data.model.Team
 import com.example.dragonstats.data.model.Encuentro
+import com.example.dragonstats.ui.viewmodel.PartidoUiState
+import com.example.dragonstats.ui.viewmodel.PartidoViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartidoDetailsScreen(
     onBackClick: (Int) -> Unit = {},
-    matchId: Int = 1
+    matchId: Int = 1,
+    totalJornadas: Int = 5, // Pasar desde la navegación
+    viewModel: PartidoViewModel = viewModel()
 ) {
-    val encuentro = CalendarioData.obtenerEncuentroPorId(matchId)
+    val uiState by viewModel.uiState.collectAsState()
 
-    if (encuentro == null) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Partido no encontrado",
-                color = Color.White,
-                fontSize = 18.sp
-            )
-        }
-        return
+    LaunchedEffect(matchId) {
+        viewModel.loadPartido(matchId)
     }
 
+    when (val state = uiState) {
+        is PartidoUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color(0xFF4CAF50))
+            }
+        }
+        is PartidoUiState.Error -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = state.message,
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { viewModel.retry() }) {
+                        Text("Reintentar")
+                    }
+                }
+            }
+        }
+        is PartidoUiState.Success -> {
+            PartidoDetailsContent(
+                encuentro = state.encuentro,
+                onBackClick = onBackClick,
+                matchId = matchId,
+                totalJornadas = totalJornadas
+            )
+        }
+    }
+}
+
+// Función helper para obtener el nombre de la fase
+private fun getFaseNombre(jornada: Int, totalJornadas: Int): String {
+    return when (jornada) {
+        totalJornadas + 1 -> "Cuartos de Final"
+        totalJornadas + 2 -> "Semifinal"
+        totalJornadas + 3 -> "Final"
+        else -> "Jornada $jornada"
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PartidoDetailsContent(
+    encuentro: Encuentro,
+    onBackClick: (Int) -> Unit,
+    matchId: Int,
+    totalJornadas: Int
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Barra de navegación superior con label de jornada
+        // Barra de navegación superior con label de jornada o fase
         TopAppBar(
             title = {
                 Text(
-                    text = "Jornada ${encuentro.jornada}",
+                    text = getFaseNombre(encuentro.jornada, totalJornadas),
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
