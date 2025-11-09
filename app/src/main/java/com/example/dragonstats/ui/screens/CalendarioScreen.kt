@@ -6,9 +6,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -21,19 +26,42 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Encuentro
-import com.example.dragonstats.data.model.CalendarioData
+import com.example.dragonstats.ui.viewmodel.CalendarioViewModel
+import com.example.dragonstats.ui.viewmodel.CalendarioUiState
 
 @Composable
 fun CalendarioScreen(
     onPartidoClick: (Int) -> Unit,
-    initialJornada: Int = 1
+    initialJornada: Int = 1,
+    viewModel: CalendarioViewModel = viewModel()
 ) {
-    val jornadas = CalendarioData.obtenerEncuentros()
     var selectedJornada by rememberSaveable { mutableIntStateOf(initialJornada) }
+    val uiState by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    // Cargar la jornada inicial cuando la pantalla se monta
+    LaunchedEffect(Unit) {
+        viewModel.loadEncuentros(initialJornada)
+    }
+
+    // Función para hacer scroll a la jornada seleccionada
+    fun scrollToJornada(jornada: Int, totalJornadas: Int) {
+        coroutineScope.launch {
+            val index = if (jornada <= totalJornadas) {
+                jornada - 1 // Jornadas regulares
+            } else {
+                totalJornadas + (jornada - totalJornadas - 1) // Fases finales
+            }
+            listState.animateScrollToItem(index)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,42 +78,187 @@ fun CalendarioScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
         )
 
-        // Navbar horizontal tipo FotMob
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp)
-        ) {
-            items(5) { index ->
-                val jornadaNum = index + 1
-                JornadaTab(
-                    jornadaNumero = jornadaNum,
-                    isSelected = selectedJornada == jornadaNum,
-                    onClick = { selectedJornada = jornadaNum }
+        when (val state = uiState) {
+            is CalendarioUiState.Loading -> {
+                LoadingStateCalendario()
+            }
+            is CalendarioUiState.Success -> {
+                // Navbar horizontal
+                LazyRow(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) {
+                    // Jornadas regulares
+                    items(state.totalJornadas) { index ->
+                        val jornadaNum = index + 1
+                        JornadaTab(
+                            jornadaNumero = jornadaNum,
+                            isSelected = selectedJornada == jornadaNum,
+                            onClick = {
+                                selectedJornada = jornadaNum
+                                viewModel.loadEncuentros(jornadaNum)
+                                scrollToJornada(jornadaNum, state.totalJornadas)
+                            }
+                        )
+                    }
+
+                    // Fases finales (después de las jornadas regulares)
+                    item {
+                        FaseTab(
+                            fase = "Cuartos",
+                            jornadaValue = state.totalJornadas + 1,
+                            isSelected = selectedJornada == state.totalJornadas + 1,
+                            onClick = {
+                                selectedJornada = state.totalJornadas + 1
+                                viewModel.loadEncuentros(state.totalJornadas + 1)
+                                scrollToJornada(state.totalJornadas + 1, state.totalJornadas)
+                            }
+                        )
+                    }
+
+                    item {
+                        FaseTab(
+                            fase = "Semifinal",
+                            jornadaValue = state.totalJornadas + 2,
+                            isSelected = selectedJornada == state.totalJornadas + 2,
+                            onClick = {
+                                selectedJornada = state.totalJornadas + 2
+                                viewModel.loadEncuentros(state.totalJornadas + 2)
+                                scrollToJornada(state.totalJornadas + 2, state.totalJornadas)
+                            }
+                        )
+                    }
+
+                    item {
+                        FaseTab(
+                            fase = "Final",
+                            jornadaValue = state.totalJornadas + 3,
+                            isSelected = selectedJornada == state.totalJornadas + 3,
+                            onClick = {
+                                selectedJornada = state.totalJornadas + 3
+                                viewModel.loadEncuentros(state.totalJornadas + 3)
+                                scrollToJornada(state.totalJornadas + 3, state.totalJornadas)
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Lista de encuentros
+                if (state.encuentros.isEmpty()) {
+                    EmptyStateCalendario()
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(state.encuentros) { encuentro ->
+                            EncuentroCard(
+                                encuentro = encuentro,
+                                onPartidoClick = { onPartidoClick(encuentro.id) }
+                            )
+                        }
+                    }
+                }
+            }
+            is CalendarioUiState.Error -> {
+                ErrorStateCalendario(
+                    message = state.message,
+                    onRetry = { viewModel.retry() }
                 )
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
+@Composable
+private fun LoadingStateCalendario() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                color = Color(0xFF4CAF50),
+                modifier = Modifier.size(48.dp)
+            )
+            Text(
+                text = "Cargando encuentros...",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
 
-        // Lista de encuentros de la jornada seleccionada
-        val jornadaActual = jornadas.find { it.numero == selectedJornada }
+@Composable
+private fun EmptyStateCalendario() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "No hay encuentros programados",
+            color = Color.Gray,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
-        if (jornadaActual != null) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+@Composable
+private fun ErrorStateCalendario(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_calendar),
+                contentDescription = null,
+                tint = Color(0xFFF44336),
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = "Error al cargar encuentros",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = message,
+                color = Color.Gray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50)
+                )
             ) {
-                items(jornadaActual.encuentros) { encuentro ->
-                    EncuentroCard(
-                        encuentro = encuentro,
-                        onPartidoClick = { onPartidoClick(encuentro.id) }
-                    )
-                }
+                Text(
+                    text = "Reintentar",
+                    color = Color.White
+                )
             }
         }
     }
@@ -111,6 +284,34 @@ private fun JornadaTab(
     ) {
         Text(
             text = "Jornada $jornadaNumero",
+            color = textColor,
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+private fun FaseTab(
+    fase: String,
+    jornadaValue: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) Color(0xFFFFD700) else Color(0xFF1A1A1A)
+    val textColor = if (isSelected) Color.Black else Color.Gray
+
+    Box(
+        modifier = Modifier
+            .height(40.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(backgroundColor)
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = fase,
             color = textColor,
             fontSize = 14.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
@@ -157,12 +358,11 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                 )
             }
 
-            // Información central (resultado si está jugado, sino hora/fecha)
+            // Información central
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                // Mostrar resultado si el partido ya se jugó
                 if (encuentro.tieneResultado) {
                     Text(
                         text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
@@ -177,7 +377,6 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                         fontWeight = FontWeight.Medium
                     )
                 } else {
-                    // Mostrar hora si está programado
                     val horaDisplay = encuentro.hora ?: "--:--"
                     Text(
                         text = horaDisplay,
