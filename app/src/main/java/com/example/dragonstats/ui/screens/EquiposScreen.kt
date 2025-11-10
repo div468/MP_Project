@@ -20,13 +20,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,14 +36,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Equipo
-import com.example.dragonstats.data.model.TorneoData
+import com.example.dragonstats.ui.viewmodel.EquiposUiState
+import com.example.dragonstats.ui.viewmodel.EquiposListadoViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun EquiposScreen(onEquipoClick: (Int) -> Unit) {
-    val equipos = TorneoData.obtenerEquiposOrdenados()
-    var equiposFavoritos by remember { mutableStateOf(setOf<String>()) }
+fun EquiposScreen(
+    onEquipoClick: (Int) -> Unit,
+    viewModel: EquiposListadoViewModel = viewModel()
+){
+    val uiState by viewModel.uiState.collectAsState()
+    val equiposFavoritos by viewModel.equiposFavoritos.collectAsState()
 
     Column(
         modifier = Modifier
@@ -61,29 +65,119 @@ fun EquiposScreen(onEquipoClick: (Int) -> Unit) {
                 .padding(vertical = 16.dp),
             textAlign = TextAlign.Center
         )
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(equipos) { equipo ->
-                EquipoCard(
-                    equipo = equipo,
-                    isFavorito = equiposFavoritos.contains(equipo.nombre),
-                    onToggleFavorito = { esFavorito ->
-                        equiposFavoritos = if (esFavorito){
-                            equiposFavoritos + equipo.nombre
-                        }else {
-                            equiposFavoritos - equipo.nombre
-                        }
+        when (uiState){
+            is EquiposUiState.Loading -> {
+                LoadingStateListE()
+            }
+            is EquiposUiState.Success -> {
+                val equipos = (uiState as EquiposUiState.Success).equipo
+                EquiposListContent(
+                    equipos = equipos,
+                    equiposFavoritos = equiposFavoritos,
+                    onToggleFavorito = { nombreEquipo ->
+                        viewModel.toggleFavorito(nombreEquipo)
                     },
-                    onVerJugadores = {
-                        onEquipoClick(equipo.id)
-                    }
+                    onEquipoClick = onEquipoClick
                 )
             }
+            is EquiposUiState.Error -> {
+                val errorMessage = (uiState as EquiposUiState.Error).message
+                ErrorStateListE(
+                    message = errorMessage,
+                    onRetry = {viewModel.cargarEquipos()}
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoadingStateListE() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                color = Color(0xFF4CAF50),
+                modifier = Modifier.size(48.dp)
+            )
+            Text(
+                text = "Cargando equipos...",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun ErrorStateListE(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Text(
+                text = "Error al cargar los datos",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = message,
+                color = Color.Gray,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50)
+                )
+            ) {
+                Text(
+                    text = "Reintentar",
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EquiposListContent(
+    equipos: List<Equipo>,
+    equiposFavoritos: Set<String>,
+    onToggleFavorito: (String) -> Unit,
+    onEquipoClick: (Int) -> Unit
+){
+    LazyColumn (
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ){
+        items(equipos) { equipo ->
+            EquipoCard(
+                equipo = equipo,
+                isFavorito = equiposFavoritos.contains(equipo.nombre),
+                onToggleFavorito = { isFavorito ->
+                    onToggleFavorito(equipo.nombre)
+                },
+                onVerJugadores = {
+                    onEquipoClick(equipo.id)
+                }
+            )
         }
     }
 }
@@ -105,11 +199,17 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(Color.Gray, RoundedCornerShape(8.dp)),
+                    .background(Color(0xFF333333), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
+                val words = equipo.nombre.split(' ').filter { it.isNotEmpty() }
+                val initials = if(words.size == 2){
+                    (words[0].take(1) + words[1].take(2)).uppercase()
+                }else{
+                    equipo.nombre.take(3).uppercase()
+                }
                 Text(
-                    text = equipo.nombre.first().toString(),
+                    text = initials,
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -127,13 +227,14 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Top
                 ) {
                     Text(
                         text = equipo.nombre,
                         color = Color.White,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f).padding(end = 8.dp)
                     )
                     Button(
                         onClick = onVerJugadores,
