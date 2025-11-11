@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.ui.screens.CalendarioScreen
 import com.example.dragonstats.ui.screens.EquiposScreen
 import com.example.dragonstats.ui.screens.GruposScreen
@@ -24,7 +25,7 @@ sealed class Screen(val route: String, val title: String) {
 }
 
 private const val EQUIPOS_LIST_ROUTE = "equipos_list"
-private const val EQUIPOS_DETAIL_ROUTE = "listadoJ/{equipoID}"
+private const val EQUIPOS_DETAIL_ROUTE = "listadoJ"
 private const val CALENDARIO_PARTIDO_DETAILS_ROUTE = "calendario/partido/{matchId}"
 private const val GRUPOS_PARTIDO_DETAILS_ROUTE = "grupos/partido/{matchId}"
 
@@ -93,17 +94,21 @@ fun NavGraphBuilder.gruposGraph(navController: NavHostController) {
 
 fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
     navigation(startDestination = EQUIPOS_LIST_ROUTE, route = Screen.EquiposGraph.route) {
-        composable(EQUIPOS_LIST_ROUTE) {
-            EquiposScreen(onEquipoClick = { equipoId ->
-                navController.navigate("listadoJ/$equipoId")
+        composable(EQUIPOS_LIST_ROUTE) { //Se envía el objeto Equipo con todos sus valores a la vista de detalles
+            EquiposScreen(onEquipoClick = { equipo ->
+                navController.currentBackStackEntry?.savedStateHandle?.set("selectedEquipo", equipo)
+                navController.navigate("listadoJ")
             })
         }
-        composable(
-            route = EQUIPOS_DETAIL_ROUTE,
-            arguments = listOf(navArgument("equipoID") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val equipoId = backStackEntry.arguments?.getInt("equipoID") ?: 0
-            ListadoScreen(e = equipoId, navController = navController)
+
+        composable("listadoJ") { //Se extraen el equipo enviado desde la vista de listado de equipos y es enviado como parametro para el Composable
+            val equipo = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipo>("selectedEquipo")
+                ?: return@composable
+
+            ListadoScreen(e = equipo, navController = navController)
         }
     }
 }
+
