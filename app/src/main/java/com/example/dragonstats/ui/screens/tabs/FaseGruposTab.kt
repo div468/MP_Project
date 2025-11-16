@@ -1,6 +1,8 @@
 package com.example.dragonstats.ui.screens.tabs
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -151,6 +154,8 @@ private fun GruposContent(grupos: List<Grupo>) {
 
 @Composable
 private fun GrupoCard(grupo: Grupo) {
+    val scrollState = rememberScrollState()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -160,57 +165,117 @@ private fun GrupoCard(grupo: Grupo) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Header del grupo con columnas alineadas
+            Text(
+                text = stringResource(id = R.string.grupo) + " " + grupo.nombre,
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .horizontalScroll(scrollState)
+                    .padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Nombre del grupo
                 Text(
                     text = stringResource(id = R.string.grupo, ) + " " + grupo.nombre,
                     color = Color.White,
-                    fontSize = 18.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.width(140.dp)
                 )
 
-                // Headers de columnas con ancho fijo
+                // PJ
                 Text(
-                    text = stringResource(id = R.string.header_partidos),
+                    text = "J",
                     color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
+                // PG
                 Text(
-                    text = stringResource(id = R.string.header_gol_diferencia),
+                    text = "G",
                     color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(50.dp)
+                    modifier = Modifier.width(40.dp)
                 )
 
+                // PE
                 Text(
-                    text = stringResource(id = R.string.header_puntos),
+                    text = "E",
                     color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(40.dp)
+                )
+
+                // PP
+                Text(
+                    text = "P",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(40.dp)
+                )
+
+                // GF
+                Text(
+                    text = "GF",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(40.dp)
+                )
+
+                // GC
+                Text(
+                    text = "GC",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(40.dp)
+                )
+
+                // DG
+                Text(
+                    text = "DG",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(40.dp)
+                )
+
+                // PTS
+                Text(
+                    text = "PTS",
+                    color = Color.White,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(50.dp)
                 )
             }
 
-            // Lista de equipos
+            // Lista de equipos con el mismo scroll state
             Column {
                 grupo.equipos.forEachIndexed { index, equipo ->
                     EquipoItem(
                         equipo = equipo,
-                        posicion = index + 1
+                        posicion = index + 1,
+                        scrollState = scrollState
                     )
                 }
             }
@@ -221,24 +286,26 @@ private fun GrupoCard(grupo: Grupo) {
 @Composable
 private fun EquipoItem(
     equipo: Equipo,
-    posicion: Int
+    posicion: Int,
+    scrollState: ScrollState
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .horizontalScroll(scrollState)
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Posición, icono y nombre del equipo
+        // Posición, icono y nombre del equipo (fijo)
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.width(140.dp)
         ) {
             // Posición
             Text(
                 text = posicion.toString(),
                 color = Color.White,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 modifier = Modifier.width(20.dp),
                 textAlign = TextAlign.Center
             )
@@ -255,40 +322,95 @@ private fun EquipoItem(
                 contentDescription = null,
                 tint = iconColor,
                 modifier = Modifier
-                    .size(24.dp)
-                    .padding(start = 4.dp, end = 8.dp)
+                    .size(20.dp)
+                    .padding(start = 4.dp, end = 6.dp)
             )
 
             // Nombre del equipo
             Text(
                 text = equipo.nombre,
                 color = if (posicion == 1) Color(0xFF4CAF50) else Color.White,
-                fontSize = 14.sp,
-                fontWeight = if (posicion == 1) FontWeight.Bold else FontWeight.Normal
+                fontSize = 13.sp,
+                fontWeight = if (posicion == 1) FontWeight.Bold else FontWeight.Normal,
+                maxLines = 1
             )
         }
 
-        // Stats con anchos fijos para alineación
+        // PJ - Partidos Jugados
         Text(
             text = equipo.partidos.toString(),
             color = Color.White,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
 
+        // PG - Partidos Ganados
         Text(
-            text = if (equipo.golDiferencia > 0) "+${equipo.golDiferencia}" else equipo.golDiferencia.toString(),
-            color = Color.White,
-            fontSize = 14.sp,
+            text = equipo.ganados.toString(),
+            color = Color(0xFF4CAF50),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.width(50.dp)
+            modifier = Modifier.width(40.dp)
         )
 
+        // PE - Partidos Empatados
+        Text(
+            text = equipo.empatados.toString(),
+            color = Color(0xFFFFEB3B),
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // PP - Partidos Perdidos
+        Text(
+            text = equipo.perdidos.toString(),
+            color = Color(0xFFF44336),
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // GF - Goles a Favor
+        Text(
+            text = equipo.golesFavor.toString(),
+            color = Color.White,
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // GC - Goles en Contra
+        Text(
+            text = equipo.golesContra.toString(),
+            color = Color.White,
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // DG - Diferencia de Goles
+        val dgColor = when {
+            equipo.golDiferencia > 0 -> Color(0xFF4CAF50)
+            equipo.golDiferencia < 0 -> Color(0xFFF44336)
+            else -> Color.White
+        }
+        Text(
+            text = if (equipo.golDiferencia > 0) "+${equipo.golDiferencia}" else equipo.golDiferencia.toString(),
+            color = dgColor,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(40.dp)
+        )
+
+        // PTS - Puntos
         Text(
             text = equipo.puntos.toString(),
             color = Color.White,
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(50.dp)
