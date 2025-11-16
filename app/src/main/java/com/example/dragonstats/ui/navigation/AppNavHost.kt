@@ -62,7 +62,8 @@ fun AppNavHost(
             val matchId = backStackEntry.arguments?.getInt("matchId") ?: 1
             PartidoDetailsScreen(
                 onBackClick = { navController.popBackStack() },
-                matchId = matchId
+                matchId = matchId,
+                totalJornadas = 5 // Total de jornadas regulares
             )
         }
 
@@ -86,7 +87,8 @@ fun NavGraphBuilder.gruposGraph(navController: NavHostController) {
                 onBackClick = {
                     navController.popBackStack()
                 },
-                matchId = matchId
+                matchId = matchId,
+                totalJornadas = 5 // Total de jornadas regulares
             )
         }
     }
@@ -94,14 +96,14 @@ fun NavGraphBuilder.gruposGraph(navController: NavHostController) {
 
 fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
     navigation(startDestination = EQUIPOS_LIST_ROUTE, route = Screen.EquiposGraph.route) {
-        composable(EQUIPOS_LIST_ROUTE) { //Se envía el objeto Equipo con todos sus valores a la vista de detalles
+        composable(EQUIPOS_LIST_ROUTE) {
             EquiposScreen(onEquipoClick = { equipo ->
                 navController.currentBackStackEntry?.savedStateHandle?.set("selectedEquipo", equipo)
                 navController.navigate("listadoJ")
             })
         }
 
-        composable("listadoJ") { //Se extraen el equipo enviado desde la vista de listado de equipos y es enviado como parametro para el Composable
+        composable("listadoJ") {
             val equipo = navController.previousBackStackEntry
                 ?.savedStateHandle
                 ?.get<Equipo>("selectedEquipo")
@@ -111,4 +113,3 @@ fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
         }
     }
 }
-
