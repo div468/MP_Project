@@ -6,8 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -119,11 +119,11 @@ private fun PartidoDetailsContent(
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { onBackClick(matchId) } ,
+                    onClick = { onBackClick(matchId) },
                     modifier = Modifier.padding(start = 4.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Regresar",
                         tint = Color.White
                     )
@@ -152,7 +152,9 @@ private fun PartidoDetailsContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // ===== ESPACIADO AGREGADO =====
+            Spacer(modifier = Modifier.height(16.dp))
+            // ===== FIN ESPACIADO =====
 
             // Solo mostrar eventos si el partido tiene resultado
             if (encuentro.tieneResultado && encuentro.eventos.isNotEmpty()) {
@@ -167,7 +169,7 @@ private fun PartidoDetailsContent(
                         )
                     }
                 }
-            } else {
+            } else if (!encuentro.tieneResultado) {
                 // Si no hay resultado, mostrar mensaje
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -195,6 +197,18 @@ private fun PartidoDetailsContent(
         }
     }
 }
+
+
+// Función helper para obtener solo primer nombre y primer apellido
+private fun getNombreCorto(nombreCompleto: String): String {
+    val partes = nombreCompleto.trim().split(" ")
+    return when {
+        partes.size >= 2 -> "${partes[0]} ${partes[1]}"
+        partes.size == 1 -> partes[0]
+        else -> nombreCompleto
+    }
+}
+
 
 @Composable
 private fun MatchHeader(
@@ -300,12 +314,15 @@ private fun MatchHeader(
     }
 }
 
+
 @Composable
 private fun EventItem(
     event: PlayerEvent,
     homeTeam: String,
     awayTeam: String
 ) {
+    val nombreCorto = getNombreCorto(event.playerName)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -323,14 +340,10 @@ private fun EventItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar del jugador
-                PlayerAvatar(playerName = event.playerName)
-
-                Spacer(modifier = Modifier.width(8.dp))
 
                 // Minuto y nombre
                 Text(
-                    text = "${event.minute} ${event.playerName}",
+                    text = "${event.minute} $nombreCorto",
                     color = Color.White,
                     fontSize = 14.sp
                 )
@@ -352,66 +365,90 @@ private fun EventItem(
 
                 // Minuto y nombre
                 Text(
-                    text = "${event.minute} ${event.playerName}",
+                    text = "$nombreCorto ${event.minute}",
                     color = Color.White,
                     fontSize = 14.sp
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Avatar del jugador
-                PlayerAvatar(playerName = event.playerName)
             }
         }
     }
 }
 
-@Composable
-private fun PlayerAvatar(playerName: String) {
-    Box(
-        modifier = Modifier
-            .size(32.dp)
-            .clip(CircleShape)
-            .background(Color(0xFF4CAF50)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = playerName.first().toString(),
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
 
 @Composable
 private fun EventIcon(eventType: EventType) {
     when (eventType) {
         EventType.GOAL -> {
+            // Ícono de gol (pelota de fútbol)
             Box(
                 modifier = Modifier
-                    .size(24.dp)
-                    .background(Color(0xFF4CAF50), RoundedCornerShape(4.dp)),
+                    .size(28.dp)
+                    .background(Color(0xFF4CAF50), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "⚽",
-                    fontSize = 12.sp
+                    fontSize = 16.sp
                 )
             }
         }
         EventType.YELLOW_CARD -> {
+            // Tarjeta amarilla
             Box(
                 modifier = Modifier
-                    .size(16.dp, 20.dp)
-                    .background(Color(0xFFFFEB3B), RoundedCornerShape(2.dp))
+                    .size(18.dp, 24.dp)
+                    .background(Color(0xFFFFEB3B), RoundedCornerShape(3.dp))
             )
         }
         EventType.RED_CARD -> {
+            // Tarjeta roja
             Box(
                 modifier = Modifier
-                    .size(16.dp, 20.dp)
-                    .background(Color(0xFFF44336), RoundedCornerShape(2.dp))
+                    .size(18.dp, 24.dp)
+                    .background(Color(0xFFF44336), RoundedCornerShape(3.dp))
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatItem(
+    label: String,
+    homeValue: String,
+    awayValue: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            color = Color.Gray,
+            fontSize = 12.sp
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = homeValue,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "-",
+                color = Color.Gray,
+                fontSize = 16.sp
+            )
+            Text(
+                text = awayValue,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }

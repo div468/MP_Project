@@ -55,7 +55,7 @@ class EncuentroRepository {
 
                     Log.d(TAG, "equipo1: $equipo1 vs equipo2: $equipo2 ($goles1-$goles2)")
 
-                    val eventos = parseEventos(encuentroMap["eventos"])
+                    val eventos = parseEventos(encuentroMap["events"], equipo1, equipo2)
 
                     // ID único: jornada * 100 + índice
                     val uniqueId = (jornada * 100) + index
@@ -138,7 +138,10 @@ class EncuentroRepository {
             val goles1 = (encuentroMap["goles1"] as? Long)?.toInt()
             val goles2 = (encuentroMap["goles2"] as? Long)?.toInt()
 
-            val eventos = parseEventos(encuentroMap["eventos"])
+            val equipo1Nombre = encuentroMap["equipo1_id"] as? String ?: ""
+            val equipo2Nombre = encuentroMap["equipo2_id"] as? String ?: ""
+
+            val eventos = parseEventos(encuentroMap["events"], equipo1Nombre, equipo2Nombre)
 
             val encuentro = Encuentro(
                 id = id,
@@ -194,23 +197,34 @@ class EncuentroRepository {
         }
     }
 
-    private fun parseEventos(eventosData: Any?): List<PlayerEvent> {
+    private fun parseEventos(eventosData: Any?, equipo1: String, equipo2: String): List<PlayerEvent> {
         return (eventosData as? List<Map<String, Any>>)?.mapNotNull { eventoMap ->
             try {
+                val minute = (eventoMap["minute"] as? Long)?.toInt() ?: 0
+                val playerName = eventoMap["player"] as? String ?: ""
+                val eventTypeStr = eventoMap["eventType"] as? String ?: ""
+                val teamName = eventoMap["team"] as? String ?: ""
+
+                // Determinar si es HOME o AWAY comparando con los nombres de equipos
+                val team = when {
+                    teamName.equals(equipo1, ignoreCase = true) -> Team.HOME
+                    teamName.equals(equipo2, ignoreCase = true) -> Team.AWAY
+                    else -> Team.HOME // Default
+                }
+
+                // Mapear el tipo de evento
+                val eventType = when (eventTypeStr.lowercase()) {
+                    "goal" -> EventType.GOAL
+                    "yellow" -> EventType.YELLOW_CARD
+                    "red" -> EventType.RED_CARD
+                    else -> EventType.GOAL // Default
+                }
+
                 PlayerEvent(
-                    minute = eventoMap["minute"] as? String ?: "",
-                    playerName = eventoMap["playerName"] as? String ?: "",
-                    eventType = when (eventoMap["eventType"] as? String) {
-                        "GOAL" -> EventType.GOAL
-                        "YELLOW_CARD" -> EventType.YELLOW_CARD
-                        "RED_CARD" -> EventType.RED_CARD
-                        else -> EventType.GOAL
-                    },
-                    team = when (eventoMap["team"] as? String) {
-                        "HOME" -> Team.HOME
-                        "AWAY" -> Team.AWAY
-                        else -> Team.HOME
-                    }
+                    minute = "${minute}'", // Convertir número a String con formato "35'"
+                    playerName = playerName,
+                    eventType = eventType,
+                    team = team
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "Error parseando evento: ${e.message}")
