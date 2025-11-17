@@ -1,7 +1,9 @@
 package com.example.dragonstats.data.model
 
-import com.example.dragonstats.R
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Equipo(
     val id: Int = 0,
     val nombre: String = "",
@@ -11,8 +13,9 @@ data class Equipo(
     val golesFavor: Int = 0,
     val perdidos: Int = 0,
     val puntos: Int = 0,
-    val grupo: String = ""
-) {
+    val grupo: String = "",
+    val jugadores: List<Jugador> = emptyList()
+): Parcelable {
 
     val partidos: Int
         get() = ganados + empatados + perdidos

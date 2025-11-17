@@ -44,7 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun EquiposScreen(
-    onEquipoClick: (Int) -> Unit,
+    onEquipoClick: (Equipo) -> Unit,
     viewModel: EquiposListadoViewModel = viewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
@@ -160,7 +160,7 @@ private fun EquiposListContent(
     equipos: List<Equipo>,
     equiposFavoritos: Set<String>,
     onToggleFavorito: (String) -> Unit,
-    onEquipoClick: (Int) -> Unit
+    onEquipoClick: (Equipo) -> Unit
 ){
     LazyColumn (
         modifier = Modifier
@@ -175,7 +175,7 @@ private fun EquiposListContent(
                     onToggleFavorito(equipo.nombre)
                 },
                 onVerJugadores = {
-                    onEquipoClick(equipo.id)
+                    onEquipoClick(equipo)
                 }
             )
         }

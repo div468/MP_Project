@@ -12,23 +12,42 @@ class EncuentroRepository {
     private val db = FirebaseFirestore.getInstance()
     private val TAG = "EncuentroRepository"
 
+    // Función helper para obtener el nombre del documento en Firestore
+    private fun getDocumentName(jornada: Int, totalJornadas: Int): String {
+        return when {
+            jornada <= totalJornadas -> "Jornada $jornada"
+            jornada == totalJornadas + 1 -> "Cuartos de final"
+            jornada == totalJornadas + 2 -> "Semifinales"
+            jornada == totalJornadas + 3 -> "Final"
+            else -> "Jornada $jornada" // Fallback
+        }
+    }
+
     suspend fun getEncuentrosPorJornada(jornada: Int): Result<List<Encuentro>> {
         return try {
             Log.d(TAG, "=== INICIO: Buscando encuentros para Jornada $jornada ===")
 
+            // Primero obtener el total de jornadas para saber el nombre correcto del documento
+            val totalJornadasResult = getTotalJornadas()
+            val totalJornadas = totalJornadasResult.getOrNull() ?: 5
+
+            val documentName = getDocumentName(jornada, totalJornadas)
+
+            Log.d(TAG, "Buscando documento: $documentName")
+
             val jornadaDoc = db.collection("tournaments")
                 .document("2025")
                 .collection("jornadas")
-                .document("Jornada $jornada")
+                .document(documentName)
                 .get()
                 .await()
 
             if (!jornadaDoc.exists()) {
-                Log.w(TAG, "Documento de Jornada $jornada no existe")
+                Log.w(TAG, "Documento '$documentName' no existe")
                 return Result.success(emptyList())
             }
 
-            Log.d(TAG, "Documento de Jornada encontrado: ${jornadaDoc.id}")
+            Log.d(TAG, "Documento encontrado: ${jornadaDoc.id}")
 
             val encuentrosArray = jornadaDoc.get("encuentros") as? List<Map<String, Any>>
 
@@ -40,8 +59,6 @@ class EncuentroRepository {
             Log.d(TAG, "Encuentros encontrados en array: ${encuentrosArray.size}")
 
             // Generar ID único: jornada * 100 + índice
-            // Ej: Jornada 1, índice 0 → ID 100
-            // Ej: Jornada 2, índice 0 → ID 200
             val encuentros = encuentrosArray.mapIndexedNotNull { index, encuentroMap ->
                 try {
                     Log.d(TAG, "--- Procesando encuentro $index ---")
@@ -54,7 +71,7 @@ class EncuentroRepository {
                     val grupo = encuentroMap["grupo"] as? String ?: ""
 
                     Log.d(TAG, "equipo1: $equipo1 vs equipo2: $equipo2 ($goles1-$goles2)")
-
+                    
                     val eventos = parseEventos(encuentroMap["events"], equipo1, equipo2)
 
                     // ID único: jornada * 100 + índice
@@ -95,33 +112,40 @@ class EncuentroRepository {
             Log.d(TAG, "=== Buscando encuentro con ID: $id ===")
 
             // Extraer jornada e índice del ID único
-            // ID 205 → jornada 2, índice 5
             val jornada = id / 100
             val index = id % 100
 
             Log.d(TAG, "ID $id decodificado → Jornada: $jornada, Índice: $index")
 
-            if (jornada < 1 || jornada > 10) {
+            if (jornada < 1 || jornada > 15) { // Aumentado para incluir playoffs
                 Log.w(TAG, "⚠️ Jornada inválida: $jornada")
                 return Result.success(null)
             }
 
+            // Obtener el total de jornadas para determinar el nombre del documento
+            val totalJornadasResult = getTotalJornadas()
+            val totalJornadas = totalJornadasResult.getOrNull() ?: 5
+
+            val documentName = getDocumentName(jornada, totalJornadas)
+
+            Log.d(TAG, "Buscando en documento: $documentName")
+
             val jornadaDoc = db.collection("tournaments")
                 .document("2025")
                 .collection("jornadas")
-                .document("Jornada $jornada")
+                .document(documentName)
                 .get()
                 .await()
 
             if (!jornadaDoc.exists()) {
-                Log.w(TAG, "⚠️ Jornada $jornada no existe")
+                Log.w(TAG, "⚠️ Documento '$documentName' no existe")
                 return Result.success(null)
             }
 
             val encuentrosArray = jornadaDoc.get("encuentros") as? List<Map<String, Any>>
 
             if (encuentrosArray == null) {
-                Log.w(TAG, "⚠️ No hay encuentros en Jornada $jornada")
+                Log.w(TAG, "⚠️ No hay encuentros en '$documentName'")
                 return Result.success(null)
             }
 
@@ -133,7 +157,7 @@ class EncuentroRepository {
 
             val encuentroMap = encuentrosArray[index]
 
-            Log.d(TAG, "✅ Encuentro encontrado en Jornada $jornada, índice $index")
+            Log.d(TAG, "✅ Encuentro encontrado en '$documentName', índice $index")
 
             val goles1 = (encuentroMap["goles1"] as? Long)?.toInt()
             val goles2 = (encuentroMap["goles2"] as? Long)?.toInt()
@@ -169,6 +193,7 @@ class EncuentroRepository {
         return try {
             Log.d(TAG, "=== Calculando total de jornadas ===")
 
+            // Verificar jornadas del 1 al 10
             val jornadasList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             var totalJornadas = 0
 
@@ -184,12 +209,12 @@ class EncuentroRepository {
                     Log.d(TAG, "Jornada $jornada existe")
                     totalJornadas = jornada
                 } else {
-                    Log.d(TAG, "Jornada $jornada no existe")
+                    Log.d(TAG, "Jornada $jornada no existe, parando búsqueda")
                     break
                 }
             }
 
-            Log.d(TAG, "✅ Total de jornadas encontradas: $totalJornadas")
+            Log.d(TAG, "✅ Total de jornadas regulares encontradas: $totalJornadas")
             Result.success(if (totalJornadas > 0) totalJornadas else 5)
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error obteniendo total de jornadas: ${e.message}")

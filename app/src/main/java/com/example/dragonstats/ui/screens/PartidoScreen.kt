@@ -33,7 +33,7 @@ import androidx.compose.runtime.getValue
 fun PartidoDetailsScreen(
     onBackClick: (Int) -> Unit = {},
     matchId: Int = 1,
-    totalJornadas: Int = 5, // Pasar desde la navegación
+    totalJornadas: Int = 5,
     viewModel: PartidoViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -265,7 +265,7 @@ private fun MatchHeader(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = encuentro.equipo1.first().toString(),
+                        text = encuentro.equipo1.firstOrNull()?.uppercase() ?: "?",
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
@@ -275,7 +275,7 @@ private fun MatchHeader(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = encuentro.equipo1,
+                    text = encuentro.equipo1.ifEmpty { "Equipo 1" },
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
@@ -294,7 +294,7 @@ private fun MatchHeader(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = encuentro.equipo2.first().toString(),
+                        text = encuentro.equipo2.firstOrNull()?.uppercase() ?: "?",
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
@@ -304,7 +304,7 @@ private fun MatchHeader(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = encuentro.equipo2,
+                    text = encuentro.equipo2.ifEmpty { "Equipo 2" },
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
@@ -377,6 +377,23 @@ private fun EventItem(
     }
 }
 
+@Composable
+private fun PlayerAvatar(playerName: String) {
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(Color(0xFF4CAF50)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = playerName.firstOrNull()?.uppercase() ?: "?",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
 
 @Composable
 private fun EventIcon(eventType: EventType) {
