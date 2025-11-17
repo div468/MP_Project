@@ -23,6 +23,71 @@ class EncuentroRepository {
         }
     }
 
+    suspend fun getBracketMatches(): Result<Map<String, List<Encuentro>>> {
+        return try {
+            Log.d(TAG, "Buscando todos los encuentros del bracket")
+            val bracketPhases = listOf("Cuartos de final", "Semifinales", "Final")
+            val bracketMap = mutableMapOf<String, List<Encuentro>>()
+
+            for (phase in bracketPhases) {
+                val result = getEncuentrosPorFase(phase)
+                result.getOrNull()?.let {
+                    bracketMap[phase] = it
+                }
+            }
+            Log.d(TAG, "encuentros procesados: ${bracketMap.values.flatten().size}")
+            Result.success(bracketMap)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error crítico obteniendo bracket matches: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun getEncuentrosPorFase(fase: String): Result<List<Encuentro>> {
+        return try {
+            val jornadaDoc = db.collection("tournaments")
+                .document("2025")
+                .collection("jornadas")
+                .document(fase)
+                .get()
+                .await()
+
+            if (!jornadaDoc.exists()) return Result.success(emptyList())
+
+            val encuentrosArray = jornadaDoc.get("encuentros") as? List<Map<String, Any>> ?: emptyList()
+            val jornadaNum = when(fase) {
+                "Cuartos de final" -> 6
+                "Semifinales" -> 7
+                "Final" -> 8
+                else -> 0
+            }
+            val encuentros = encuentrosArray.mapIndexedNotNull { index, encuentroMap ->
+                try {
+                    val goles1 = (encuentroMap["goles1"] as? Long)?.toInt()
+                    val goles2 = (encuentroMap["goles2"] as? Long)?.toInt()
+                    Encuentro(
+                        id = (jornadaNum * 100) + index,
+                        equipo1 = encuentroMap["equipo1_id"] as? String ?: "",
+                        equipo2 = encuentroMap["equipo2_id"] as? String ?: "",
+                        fecha = encuentroMap["date"] as? String ?: "POR DEFINIR",
+                        hora = encuentroMap["hora"] as? String,
+                        resultado = if (goles1 != null && goles2 != null) "$goles1-$goles2" else null,
+                        jornada = jornadaNum,
+                        golesEquipo1 = goles1,
+                        golesEquipo2 = goles2,
+                        eventos = parseEventos(encuentroMap["events"] ?: encuentroMap["eventos"]),
+                        grupo = encuentroMap["grupo"] as? String ?: ""
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            Result.success(encuentros)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getEncuentrosPorJornada(jornada: Int): Result<List<Encuentro>> {
         return try {
             Log.d(TAG, "=== INICIO: Buscando encuentros para Jornada $jornada ===")

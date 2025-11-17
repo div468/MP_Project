@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Encuentro
-import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Round
 import com.example.dragonstats.ui.viewmodel.GruposUiState
 import com.example.dragonstats.ui.viewmodel.GruposViewModel
@@ -150,8 +149,7 @@ fun BracketStageTab(viewModel: GruposViewModel, navController: NavController) {
             }
             is GruposUiState.Success -> {
                 BracketContent(
-                    viewModel = viewModel,
-                    topTeams = state.topTeams,
+                    bracketMatches = state.bracketMatches,
                     navController = navController
                 )
             }
@@ -237,13 +235,12 @@ private fun ErrorStateBracket(
 
 @Composable
 private fun BracketContent(
-    viewModel: GruposViewModel,
-    topTeams: List<Equipo>,
+    bracketMatches: Map<String, List<Encuentro>>,
     navController: NavController
 ) {
-    val quarterFinals = viewModel.createQuarterFinals(topTeams)
-    val semiFinals = viewModel.createSemiFinals()
-    val finalMatch = viewModel.createFinal()
+    val quarterFinals = bracketMatches["Cuartos de final"] ?: emptyList()
+    val semiFinals = bracketMatches["Semifinales"] ?: emptyList()
+    val finalMatch = bracketMatches["Final"]?.firstOrNull()
 
     val topRounds = listOf(
         Round(
@@ -293,22 +290,24 @@ private fun BracketContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = stringResource(id = R.string.header_phase4),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black,
-            color = Color.White
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        EncuentroCard(
-            encuentro = finalMatch,
-            modifier = Modifier
-                .width(180.dp)
-                .height(120.dp),
-            onClick = {
-                navController.navigate("grupos/partido/${finalMatch.id}")
-            }
-        )
+        if (finalMatch != null) {
+            Text(
+                text = stringResource(id = R.string.header_phase4),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            EncuentroCard(
+                encuentro = finalMatch,
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(120.dp),
+                onClick = {
+                    navController.navigate("grupos/partido/${finalMatch.id}")
+                }
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
