@@ -209,9 +209,9 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
                     fontSize = 25.sp
                 )
                 Text(
-                    text = stringResource(R.string.ganados)+ " " + 5 +
-                            " " + stringResource(R.string.empatados) + " " + 0 +
-                            " " + stringResource(R.string.perdidos) + " " + 2
+                    text = stringResource(R.string.ganados)+ " " + equipo.ganados +
+                            " " + stringResource(R.string.empatados) + " " + equipo.empatados +
+                            " " + stringResource(R.string.perdidos) + " " + equipo.perdidos
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
