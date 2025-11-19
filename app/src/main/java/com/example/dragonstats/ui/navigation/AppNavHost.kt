@@ -12,6 +12,7 @@ import androidx.navigation.navigation
 import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.ui.screens.CalendarioScreen
 import com.example.dragonstats.ui.screens.EquiposScreen
+import com.example.dragonstats.ui.screens.EstadisticasScreen
 import com.example.dragonstats.ui.screens.GruposScreen
 import com.example.dragonstats.ui.screens.ListadoScreen
 import com.example.dragonstats.ui.screens.PartidoDetailsScreen
@@ -22,6 +23,7 @@ sealed class Screen(val route: String, val title: String) {
     }
     object Grupos : Screen("grupos", "Grupos")
     object EquiposGraph : Screen("equipos_graph", "Equipos")
+    object Estadisticas : Screen("estadisticas", "Estadísticas")
 }
 
 private const val EQUIPOS_LIST_ROUTE = "equipos_list"
@@ -63,13 +65,18 @@ fun AppNavHost(
             PartidoDetailsScreen(
                 onBackClick = { navController.popBackStack() },
                 matchId = matchId,
-                totalJornadas = 5 // Total de jornadas regulares
+                totalJornadas = 5
             )
         }
 
         gruposGraph(navController)
 
         equiposGraph(navController)
+
+        // Nueva navegación para Estadísticas
+        composable(Screen.Estadisticas.route) {
+            EstadisticasScreen()
+        }
     }
 }
 
@@ -88,7 +95,7 @@ fun NavGraphBuilder.gruposGraph(navController: NavHostController) {
                     navController.popBackStack()
                 },
                 matchId = matchId,
-                totalJornadas = 5 // Total de jornadas regulares
+                totalJornadas = 5
             )
         }
     }

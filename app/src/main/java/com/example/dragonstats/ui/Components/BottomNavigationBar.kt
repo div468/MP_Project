@@ -27,7 +27,8 @@ fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         BottomNavItem(Screen.Calendario, R.drawable.ic_calendar, R.string.nav_calendario),
         BottomNavItem(Screen.Grupos, R.drawable.ic_schedule, R.string.nav_grupos),
-        BottomNavItem(Screen.EquiposGraph, R.drawable.ic_teams, R.string.nav_equipos)
+        BottomNavItem(Screen.EquiposGraph, R.drawable.ic_teams, R.string.nav_equipos),
+        BottomNavItem(Screen.Estadisticas, R.drawable.ic_stats, R.string.nav_estadisticas)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -37,11 +38,12 @@ fun BottomNavigationBar(navController: NavController) {
         containerColor = Color(0xFF4CAF50)
     ) {
         items.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { 
+            val isSelected = currentDestination?.hierarchy?.any {
                 val route = it.route ?: ""
                 when (item.screen) {
                     Screen.Calendario -> route.startsWith("calendario")
                     Screen.Grupos -> route == "grupos" || route.startsWith("grupos/")
+                    Screen.Estadisticas -> route == "estadisticas"
                     else -> route == item.screen.route
                 }
             } == true
