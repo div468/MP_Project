@@ -1,5 +1,6 @@
 package com.example.dragonstats.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +44,7 @@ import com.example.dragonstats.ui.viewmodel.EquiposListadoViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
 fun EquiposScreen(
@@ -183,7 +187,12 @@ private fun EquiposListContent(
 }
 
 @Composable
-private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Boolean) -> Unit, onVerJugadores:()->Unit){
+private fun EquipoCard(
+    equipo: Equipo,
+    isFavorito: Boolean,
+    onToggleFavorito:(Boolean) -> Unit,
+    onVerJugadores:()->Unit
+){
     Card(
         modifier = Modifier.fillMaxSize(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
@@ -196,26 +205,21 @@ private fun EquipoCard(equipo: Equipo, isFavorito: Boolean, onToggleFavorito:(Bo
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Logo del equipo
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(Color(0xFF333333), RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF333333)),
                 contentAlignment = Alignment.Center
             ) {
-                val words = equipo.nombre.split(' ').filter { it.isNotEmpty() }
-                val initials = if(words.size == 2){
-                    (words[0].take(1) + words[1].take(2)).uppercase()
-                }else{
-                    equipo.nombre.take(3).uppercase()
-                }
-                Text(
-                    text = initials,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                Image(
+                    painter = painterResource(id = EquipoLogoHelper.getLogoResource(equipo.nombre)),
+                    contentDescription = "Logo de ${equipo.nombre}",
+                    modifier = Modifier.size(56.dp),
+                    contentScale = ContentScale.Fit
                 )
             }
-
 
             Spacer(modifier = Modifier.width(16.dp))
 

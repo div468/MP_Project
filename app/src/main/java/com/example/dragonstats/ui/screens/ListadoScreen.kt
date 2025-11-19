@@ -1,6 +1,6 @@
 package com.example.dragonstats.ui.screens
 
-import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +41,7 @@ import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Jugador
 import com.example.dragonstats.ui.viewmodel.EquiposListadoViewModel
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
 fun ListadoScreen (e: Equipo, navController: NavController){
@@ -181,25 +183,22 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
             modifier = Modifier.fillMaxSize().padding(top = 0.dp, start = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
+            // Logo del equipo
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(Color(0xFF333333), RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF333333)),
                 contentAlignment = Alignment.Center
             ) {
-                val words = equipo.nombre.split(' ').filter { it.isNotEmpty() }
-                val initials = if(words.size == 2){
-                    (words[0].take(1) + words[1].take(2)).uppercase()
-                }else{
-                    equipo.nombre.take(3).uppercase()
-                }
-                Text(
-                    text = initials,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                Image(
+                    painter = painterResource(id = EquipoLogoHelper.getLogoResource(equipo.nombre)),
+                    contentDescription = "Logo de ${equipo.nombre}",
+                    modifier = Modifier.size(56.dp),
+                    contentScale = ContentScale.Fit
                 )
             }
+
             Column(
                 modifier = Modifier.fillMaxSize().padding(vertical =30.dp, horizontal = 10.dp ),
                 verticalArrangement = Arrangement.Center

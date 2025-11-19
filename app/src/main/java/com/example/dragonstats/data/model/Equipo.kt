@@ -14,7 +14,8 @@ data class Equipo(
     val perdidos: Int = 0,
     val puntos: Int = 0,
     val grupo: String = "",
-    val jugadores: List<Jugador> = emptyList()
+    val jugadores: List<Jugador> = emptyList(),
+    val logoUrl: String = "" // URL o nombre del logo del equipo
 ): Parcelable {
 
     val partidos: Int
@@ -32,6 +33,7 @@ data class Equipo(
         golesFavor = 0,
         perdidos = 0,
         puntos = 0,
-        grupo = ""
+        grupo = "",
+        logoUrl = ""
     )
 }
