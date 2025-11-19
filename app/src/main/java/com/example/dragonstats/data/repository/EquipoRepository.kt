@@ -50,7 +50,8 @@ class EquipoRepository {
                             perdidos = doc.getLong("perdidos")?.toInt() ?: 0,
                             puntos = doc.getLong("puntos")?.toInt() ?: 0,
                             grupo = grupoNombre,
-                            jugadores = jugadores
+                            jugadores = jugadores,
+                            logoUrl = doc.getString("logoUrl") ?: "" // Cargar el campo logoUrl
                         )
                     } catch (e: Exception) {
                         null
@@ -74,6 +75,7 @@ class EquipoRepository {
             Result.failure(e)
         }
     }
+
     suspend fun getEquiposOrdenados(): Result<List<Equipo>> {
         return try {
             val grupos = getGrupos().getOrNull() ?: emptyList()
