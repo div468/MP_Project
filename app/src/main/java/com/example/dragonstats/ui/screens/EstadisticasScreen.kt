@@ -17,16 +17,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +54,8 @@ fun EstadisticasScreen(
     viewModel: EstadisticasViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var expandedFaseGrupos by rememberSaveable { mutableStateOf(false) }
+    var expandedFaseFinales by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -92,10 +101,20 @@ fun EstadisticasScreen(
 
                     // Sección: Top 10 Fase de Grupos
                     item {
-                        SectionHeader(title = stringResource(id = R.string.top10_fase_grupos))
+                        SectionHeaderWithExpand(
+                            title = stringResource(id = R.string.top10_fase_grupos),
+                            isExpanded = expandedFaseGrupos,
+                            onToggleExpand = { expandedFaseGrupos = !expandedFaseGrupos }
+                        )
                     }
 
-                    itemsIndexed(state.estadisticas.top10FaseGrupos) { index, goleador ->
+                    val goleadoresFaseGruposToShow = if (expandedFaseGrupos) {
+                        state.estadisticas.top10FaseGrupos
+                    } else {
+                        state.estadisticas.top10FaseGrupos.take(3)
+                    }
+
+                    itemsIndexed(goleadoresFaseGruposToShow) { index, goleador ->
                         GoleadorCard(
                             posicion = index + 1,
                             goleador = goleador
@@ -108,10 +127,20 @@ fun EstadisticasScreen(
 
                     // Sección: Top 10 Fase Finales
                     item {
-                        SectionHeader(title = stringResource(id = R.string.top10_fase_finales))
+                        SectionHeaderWithExpand(
+                            title = stringResource(id = R.string.top10_fase_finales),
+                            isExpanded = expandedFaseFinales,
+                            onToggleExpand = { expandedFaseFinales = !expandedFaseFinales }
+                        )
                     }
 
-                    itemsIndexed(state.estadisticas.top10FaseFinales) { index, goleador ->
+                    val goleadoresFaseFinalestoShow = if (expandedFaseFinales) {
+                        state.estadisticas.top10FaseFinales
+                    } else {
+                        state.estadisticas.top10FaseFinales.take(3)
+                    }
+
+                    itemsIndexed(goleadoresFaseFinalestoShow) { index, goleador ->
                         GoleadorCard(
                             posicion = index + 1,
                             goleador = goleador,
@@ -212,6 +241,40 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
+private fun SectionHeaderWithExpand(
+    title: String,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            color = Color(0xFF4CAF50),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        IconButton(
+            onClick = onToggleExpand,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = if (isExpanded) "Mostrar menos" else "Mostrar todos",
+                tint = Color(0xFF4CAF50),
+                modifier = Modifier.size(28.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun MaxGoleadoresPorEquipoCard(
     goleadores: Map<String, Goleador>
 ) {
@@ -245,13 +308,6 @@ private fun MaxGoleadoresPorEquipoCard(
                             color = Color.White,
                             fontSize = 13.sp
                         )
-                        if (goleador.posicion.isNotEmpty()) {
-                            Text(
-                                text = goleador.posicion,
-                                color = Color.Gray,
-                                fontSize = 11.sp
-                            )
-                        }
                     }
 
                     Row(
@@ -345,13 +401,6 @@ private fun GoleadorCard(
                     color = if (isPlayoffs) Color(0xFFFFD700) else Color(0xFF4CAF50),
                     fontSize = 13.sp
                 )
-                if (goleador.posicion.isNotEmpty()) {
-                    Text(
-                        text = goleador.posicion,
-                        color = Color.Gray,
-                        fontSize = 11.sp
-                    )
-                }
             }
 
             // Goles
