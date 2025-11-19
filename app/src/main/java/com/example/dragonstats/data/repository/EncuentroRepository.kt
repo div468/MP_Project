@@ -65,17 +65,21 @@ class EncuentroRepository {
                 try {
                     val goles1 = (encuentroMap["goles1"] as? Long)?.toInt()
                     val goles2 = (encuentroMap["goles2"] as? Long)?.toInt()
+                    val equipo1 = encuentroMap["equipo1_id"] as? String ?: ""
+                    val equipo2 = encuentroMap["equipo2_id"] as? String ?: ""
+                    val eventos = parseEventos(encuentroMap["events"] ?: encuentroMap["eventos"], equipo1, equipo2)
+
                     Encuentro(
                         id = (jornadaNum * 100) + index,
-                        equipo1 = encuentroMap["equipo1_id"] as? String ?: "",
-                        equipo2 = encuentroMap["equipo2_id"] as? String ?: "",
+                        equipo1 = equipo1,
+                        equipo2 = equipo2,
                         fecha = encuentroMap["date"] as? String ?: "POR DEFINIR",
                         hora = encuentroMap["hora"] as? String,
                         resultado = if (goles1 != null && goles2 != null) "$goles1-$goles2" else null,
                         jornada = jornadaNum,
                         golesEquipo1 = goles1,
                         golesEquipo2 = goles2,
-                        eventos = parseEventos(encuentroMap["events"] ?: encuentroMap["eventos"]),
+                        eventos = eventos,
                         grupo = encuentroMap["grupo"] as? String ?: ""
                     )
                 } catch (e: Exception) {
