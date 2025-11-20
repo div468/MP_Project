@@ -105,7 +105,7 @@ fun EncuentroCard(
 ) {
     Box {
         Card(
-            modifier = modifier.clickable { onClick() }, // Apply the modifier passed from the caller
+            modifier = modifier.clickable { onClick() },
             elevation = CardDefaults.cardElevation(30.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
@@ -157,7 +157,7 @@ fun EncuentroCard(
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
                 contentDescription = "Final Match Trophy",
-                tint = Color(0xFFFFD700), // Gold color
+                tint = Color(0xFFFFD700),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .offset(y = (-12).dp)
@@ -355,7 +355,7 @@ private fun BracketContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp)) // Increased spacer for final
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (finalMatch != null) {
             Text(
@@ -364,7 +364,7 @@ private fun BracketContent(
                 fontWeight = FontWeight.Black,
                 color = Color.White
             )
-            Spacer(modifier = Modifier.height(12.dp)) // Increased spacer for final
+            Spacer(modifier = Modifier.height(12.dp))
             EncuentroCard(
                 encuentro = finalMatch,
                 teamLogoMap = teamLogoMap,

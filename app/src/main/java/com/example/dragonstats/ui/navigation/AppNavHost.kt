@@ -1,7 +1,9 @@
 package com.example.dragonstats.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,12 +18,14 @@ import com.example.dragonstats.ui.screens.EstadisticasScreen
 import com.example.dragonstats.ui.screens.GruposScreen
 import com.example.dragonstats.ui.screens.ListadoScreen
 import com.example.dragonstats.ui.screens.PartidoDetailsScreen
+import com.example.dragonstats.ui.viewmodel.GruposViewModel
 
 sealed class Screen(val route: String, val title: String) {
     object Calendario : Screen("calendario/{jornada}", "Calendario") {
         fun createRoute(jornada: Int = 1) = "calendario/$jornada"
     }
     object Grupos : Screen("grupos", "Grupos")
+    object GruposGraph : Screen("grupos_graph", "Grupos")
     object EquiposGraph : Screen("equipos_graph", "Equipos")
     object Estadisticas : Screen("estadisticas", "Estadísticas")
 }
@@ -81,9 +85,13 @@ fun AppNavHost(
 }
 
 fun NavGraphBuilder.gruposGraph(navController: NavHostController) {
-    navigation(startDestination = Screen.Grupos.route, route = "grupos_graph") {
-        composable(Screen.Grupos.route) {
-            GruposScreen(navController = navController)
+    navigation(startDestination = Screen.Grupos.route, route = Screen.GruposGraph.route) {
+        composable(Screen.Grupos.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.GruposGraph.route)
+            }
+            val viewModel: GruposViewModel = viewModel(parentEntry)
+            GruposScreen(navController = navController, viewModel = viewModel)
         }
         composable(
             route = GRUPOS_PARTIDO_DETAILS_ROUTE,

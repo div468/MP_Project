@@ -10,8 +10,8 @@ data class Encuentro(
     val jornada: Int,
     val golesEquipo1: Int? = null,
     val golesEquipo2: Int? = null,
-    val penalesEquipo1: Int? = null, // Penales equipo 1
-    val penalesEquipo2: Int? = null, // Penales equipo 2
+    val penalesEquipo1: Int? = null,
+    val penalesEquipo2: Int? = null,
     val eventos: List<PlayerEvent> = emptyList(),
     val grupo: String? = null
 ) {

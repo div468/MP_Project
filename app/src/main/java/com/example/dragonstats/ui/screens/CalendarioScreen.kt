@@ -46,9 +46,9 @@ fun CalendarioScreen(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Cargar la jornada inicial cuando la pantalla se monta
-    LaunchedEffect(Unit) {
-        viewModel.loadEncuentros(initialJornada)
+    // Cargar los encuentros para la jornada seleccionada
+    LaunchedEffect(selectedJornada) {
+        viewModel.loadEncuentros(selectedJornada)
     }
 
     // Función para hacer scroll a la jornada seleccionada
@@ -100,7 +100,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == jornadaNum,
                             onClick = {
                                 selectedJornada = jornadaNum
-                                viewModel.loadEncuentros(jornadaNum)
                                 scrollToJornada(jornadaNum, state.totalJornadas)
                             }
                         )
@@ -114,7 +113,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == state.totalJornadas + 1,
                             onClick = {
                                 selectedJornada = state.totalJornadas + 1
-                                viewModel.loadEncuentros(state.totalJornadas + 1)
                                 scrollToJornada(state.totalJornadas + 1, state.totalJornadas)
                             }
                         )
@@ -127,7 +125,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == state.totalJornadas + 2,
                             onClick = {
                                 selectedJornada = state.totalJornadas + 2
-                                viewModel.loadEncuentros(state.totalJornadas + 2)
                                 scrollToJornada(state.totalJornadas + 2, state.totalJornadas)
                             }
                         )
@@ -140,7 +137,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == state.totalJornadas + 3,
                             onClick = {
                                 selectedJornada = state.totalJornadas + 3
-                                viewModel.loadEncuentros(state.totalJornadas + 3)
                                 scrollToJornada(state.totalJornadas + 3, state.totalJornadas)
                             }
                         )
