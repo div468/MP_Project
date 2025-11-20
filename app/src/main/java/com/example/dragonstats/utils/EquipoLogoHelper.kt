@@ -10,6 +10,7 @@ object EquipoLogoHelper {
     fun getLogoResource(nombreEquipo: String): Int {
         return when (nombreEquipo.trim()) {
             "Pikos fc" -> R.drawable.pikos_fc
+            "pikos fc" -> R.drawable.pikos_fc
             "Inter Galaxi" -> R.drawable.inter_galaxi
             "Siervas" -> R.drawable.siervas_fc
             "Ixbalanque" -> R.drawable.ixbalanque

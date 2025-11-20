@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -335,10 +336,11 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Equipo 1
+            // Equipo 1 - Con ancho máximo definido
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.Start
             ) {
                 // Logo del equipo 1
                 Box(
@@ -372,7 +374,11 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                     text = encuentro.equipo1,
                     color = Color.White,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
             }
 
@@ -410,7 +416,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                 }
             }
 
-            // Equipo 2
+            // Equipo 2 - Con ancho máximo definido y alineado a la derecha
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
@@ -420,7 +426,12 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                     text = encuentro.equipo2,
                     color = Color.White,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
