@@ -1,5 +1,6 @@
 package com.example.dragonstats.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +36,7 @@ import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Encuentro
 import com.example.dragonstats.ui.viewmodel.CalendarioViewModel
 import com.example.dragonstats.ui.viewmodel.CalendarioUiState
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
 fun CalendarioScreen(
@@ -337,12 +340,31 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_equipo_default),
-                    contentDescription = null,
-                    tint = colorResource(id = R.color.green_calendar),
-                    modifier = Modifier.size(24.dp)
-                )
+                // Logo del equipo 1
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF333333)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo1)
+                    if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                        Image(
+                            painter = painterResource(id = logoRes),
+                            contentDescription = "Logo ${encuentro.equipo1}",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_equipo_default),
+                            contentDescription = null,
+                            tint = colorResource(id = R.color.green_calendar),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
@@ -403,12 +425,31 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_equipo_default),
-                    contentDescription = null,
-                    tint = colorResource(id = R.color.green_calendar),
-                    modifier = Modifier.size(24.dp)
-                )
+                // Logo del equipo 2
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF333333)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo2)
+                    if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                        Image(
+                            painter = painterResource(id = logoRes),
+                            contentDescription = "Logo ${encuentro.equipo2}",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_equipo_default),
+                            contentDescription = null,
+                            tint = colorResource(id = R.color.green_calendar),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
         }
     }
