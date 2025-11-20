@@ -63,7 +63,7 @@ fun EquiposScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Left
         )
         when (uiState){
             is EquiposUiState.Loading -> {

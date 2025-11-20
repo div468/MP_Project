@@ -66,6 +66,9 @@ class EquiposListadoViewModel(
 
     //Para reordenar los equipos para favoritos primero y despues ordenar por puntos
     private fun reordenarEquipos(){
+        if (equiposOriginal.isEmpty()){
+            return
+        }
         val favoritos = _equiposFavoritos.value
         val equiposOrdenados = equiposOriginal.sortedWith (
             compareByDescending <Equipo> {favoritos.contains(it.nombre)  }
