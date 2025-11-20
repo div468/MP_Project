@@ -51,7 +51,7 @@ class EquipoRepository {
                             puntos = doc.getLong("puntos")?.toInt() ?: 0,
                             grupo = grupoNombre,
                             jugadores = jugadores,
-                            logoUrl = doc.getString("logoUrl") ?: "" // Cargar el campo logoUrl
+                            logoUrl = doc.getString("logoUrl") ?: ""
                         )
                     } catch (e: Exception) {
                         null
