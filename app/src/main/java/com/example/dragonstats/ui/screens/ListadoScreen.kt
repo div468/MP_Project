@@ -47,6 +47,7 @@ import com.example.dragonstats.utils.EquipoLogoHelper
 fun ListadoScreen (e: Equipo, navController: NavController){
     Box( //Contenedor de la vista
         modifier = Modifier.fillMaxSize()
+            .padding(vertical = 10.dp, horizontal = 3.dp)
             .background(Color.Black)
     ){
         Column(
@@ -54,13 +55,15 @@ fun ListadoScreen (e: Equipo, navController: NavController){
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Row( //Contenedor del botón de retroceso y título
-                modifier = Modifier.fillMaxWidth().height(25.dp)
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top=15.dp)
+                    .height(25.dp)
                     .background(Color.Transparent),
 
                 ){
                 IconButton(
                     onClick = { navController.popBackStack() },
-                    modifier = Modifier.height(18.dp)
+                    modifier = Modifier.height(25.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -101,28 +104,28 @@ fun Encabezados(){
             text = stringResource(R.string.jugador),
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(2f),
+            modifier = Modifier.weight(2.25f).padding(start = 5.dp),
             textAlign = TextAlign.Start
         )
         Text(
             text = stringResource(R.string.goles), //Goles
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1.5f),
             textAlign = TextAlign.Center
         )
         Text(
             text = stringResource(R.string.asistencias), //Asistencias
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1.25f),
             textAlign = TextAlign.Center
         )
         Text(
             text = stringResource(R.string.posicion),
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(2f),
+            modifier = Modifier.weight(1.85f),
             textAlign = TextAlign.Center
         )
     }
@@ -140,14 +143,14 @@ fun FilaJugador(j:Jugador){
         // Columna Jugador
         Text(
             text = j.nombre,
-            modifier = Modifier.weight(2f),
+            modifier = Modifier.weight(2.25f),
             textAlign = TextAlign.Start
         )
 
         // Columna Goles
         Text(
             text = j.goles.toString(),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1.5f),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold
         )
@@ -155,14 +158,14 @@ fun FilaJugador(j:Jugador){
         // Columna Asistencias
         Text(
             text = j.asistencias.toString(),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1.25f),
             textAlign = TextAlign.Center
         )
 
         // Columna Posición
         Text(
             text = j.posicion,
-            modifier = Modifier.weight(1.5f),
+            modifier = Modifier.weight(1.85f),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall
         )
@@ -175,7 +178,7 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
     var isLiked = equiposFavoritos.contains(equipo.nombre) //Se verifica si el equipo está agregado como favorito de manera local
     Box( //Contenedor con los datos del equipo
         modifier = Modifier.padding(horizontal = 15.dp)
-            .padding(top = 40.dp)
+            .padding(top = 30.dp)
             .fillMaxWidth()
             .height(150.dp).background(Color(0xFF1A1A1A),RoundedCornerShape(12.dp))
     ){
@@ -200,7 +203,7 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
             }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(vertical =30.dp, horizontal = 10.dp ),
+                modifier = Modifier.fillMaxSize().padding(vertical=20.dp, horizontal = 10.dp ),
                 verticalArrangement = Arrangement.Center
             ){ //Datos generales del equipo
                 Text(
