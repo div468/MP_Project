@@ -1,5 +1,6 @@
 package com.example.dragonstats.ui.screens.tabs
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,6 +21,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,31 +37,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Encuentro
+import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Round
 import com.example.dragonstats.ui.viewmodel.GruposUiState
 import com.example.dragonstats.ui.viewmodel.GruposViewModel
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
-fun TeamBox(teamName: String) {
-    val words = teamName.split(' ').filter { it.isNotEmpty() }
-    val initials = if (words.size == 2) {
-        (words[0].take(1) + words[1].take(2)).uppercase()
-    } else {
-        teamName.take(3).uppercase()
-    }
-
+fun TeamBox(teamName: String, logoUrl: String?) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.width(40.dp)
@@ -68,57 +67,115 @@ fun TeamBox(teamName: String) {
                 .background(Color(0xFF333333), shape = RoundedCornerShape(18.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = initials,
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+            val logoRes = EquipoLogoHelper.getLogoResource(teamName)
+            if (logoRes != 0) {
+                Image(
+                    painter = painterResource(id = logoRes),
+                    contentDescription = "$teamName logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                val words = teamName.split(' ').filter { it.isNotEmpty() }
+                val initials = if (words.size >= 2) {
+                    (words.getOrNull(0)?.take(1) ?: "") + (words.getOrNull(1)?.take(2) ?: "")
+                } else {
+                    teamName.take(3)
+                }.uppercase()
+
+                Text(
+                    text = initials,
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EncuentroCard(
+    encuentro: Encuentro,
+    teamLogoMap: Map<String, String>,
+    modifier: Modifier,
+    isFinalMatch: Boolean = false,
+    onClick: () -> Unit
+) {
+    Box {
+        Card(
+            modifier = modifier.clickable { onClick() }, // Apply the modifier passed from the caller
+            elevation = CardDefaults.cardElevation(30.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colorResource(id = R.color.dark_gray)
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp, horizontal = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    TeamBox(
+                        teamName = encuentro.equipo1,
+                        logoUrl = teamLogoMap[encuentro.equipo1]
+                    )
+                    TeamBox(
+                        teamName = encuentro.equipo2,
+                        logoUrl = teamLogoMap[encuentro.equipo2]
+                    )
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = encuentro.resultado ?: "0-0",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = Color.White
+                    )
+                    if (encuentro.penalesEquipo1 != null && encuentro.penalesEquipo2 != null) {
+                        Text(
+                            text = "(${encuentro.penalesEquipo1}-${encuentro.penalesEquipo2})",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+
+        if (isFinalMatch) {
+            Icon(
+                imageVector = Icons.Default.EmojiEvents,
+                contentDescription = "Final Match Trophy",
+                tint = Color(0xFFFFD700), // Gold color
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = (-12).dp)
+                    .size(24.dp)
             )
         }
     }
 }
 
 @Composable
-fun EncuentroCard(encuentro: Encuentro, modifier: Modifier, onClick: () -> Unit) {
+fun CenteredMatchRow(
+    encuentros: List<Encuentro>,
+    teamLogoMap: Map<String, String>,
+    navController: NavController
+) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val cardWidth = (screenWidth - 24.dp - 64.dp) / 4
-    Card(
-        modifier = Modifier
-            .width(cardWidth)
-            .height(80.dp)
-            .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(30.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.dark_gray)
-        )
-    ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Column(
-            modifier = Modifier.fillMaxSize().padding(6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ){
-                TeamBox(teamName = encuentro.equipo1)
-                TeamBox(teamName = encuentro.equipo2)
-            }
-            Text(
-                text = encuentro.resultado ?: "0-0",
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
 
-@Composable
-fun CenteredMatchRow(encuentros: List<Encuentro>, navController: NavController) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -128,9 +185,12 @@ fun CenteredMatchRow(encuentros: List<Encuentro>, navController: NavController) 
             contentPadding = PaddingValues(horizontal = 0.dp)
         ) {
             items(encuentros) { encuentro ->
-                EncuentroCard(encuentro = encuentro, modifier = Modifier, onClick = {
-                    navController.navigate("grupos/partido/${encuentro.id}")
-                })
+                EncuentroCard(
+                    encuentro = encuentro,
+                    teamLogoMap = teamLogoMap,
+                    modifier = Modifier.width(cardWidth).height(80.dp),
+                    onClick = { navController.navigate("grupos/partido/${encuentro.id}") }
+                )
             }
         }
     }
@@ -147,12 +207,16 @@ fun BracketStageTab(viewModel: GruposViewModel, navController: NavController) {
             is GruposUiState.Loading -> {
                 LoadingStateBracket()
             }
+
             is GruposUiState.Success -> {
+                val allTeams = state.grupos.flatMap { it.equipos }
                 BracketContent(
                     bracketMatches = state.bracketMatches,
+                    allTeams = allTeams,
                     navController = navController
                 )
             }
+
             is GruposUiState.Error -> {
                 ErrorStateBracket(
                     message = state.message,
@@ -236,8 +300,11 @@ private fun ErrorStateBracket(
 @Composable
 private fun BracketContent(
     bracketMatches: Map<String, List<Encuentro>>,
+    allTeams: List<Equipo>,
     navController: NavController
 ) {
+    val teamLogoMap = allTeams.associate { it.nombre to it.logoUrl }
+
     val quarterFinals = bracketMatches["Cuartos de final"] ?: emptyList()
     val semiFinals = bracketMatches["Semifinales"] ?: emptyList()
     val finalMatch = bracketMatches["Final"]?.firstOrNull()
@@ -271,7 +338,7 @@ private fun BracketContent(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
-    ){
+    ) {
         topRounds.forEach { round ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -284,11 +351,11 @@ private fun BracketContent(
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                CenteredMatchRow(round.encuentros, navController = navController)
+                CenteredMatchRow(round.encuentros, teamLogoMap, navController = navController)
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp)) // Increased spacer for final
 
         if (finalMatch != null) {
             Text(
@@ -297,12 +364,14 @@ private fun BracketContent(
                 fontWeight = FontWeight.Black,
                 color = Color.White
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp)) // Increased spacer for final
             EncuentroCard(
                 encuentro = finalMatch,
+                teamLogoMap = teamLogoMap,
+                isFinalMatch = true,
                 modifier = Modifier
-                    .width(180.dp)
-                    .height(120.dp),
+                    .width(120.dp)
+                    .height(100.dp), 
                 onClick = {
                     navController.navigate("grupos/partido/${finalMatch.id}")
                 }
@@ -315,7 +384,7 @@ private fun BracketContent(
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(
                     text = round.phase,
                     style = MaterialTheme.typography.titleMedium,
@@ -323,36 +392,8 @@ private fun BracketContent(
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                CenteredMatchRow(round.encuentros, navController = navController)
+                CenteredMatchRow(round.encuentros, teamLogoMap, navController = navController)
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewMatchCard() {
-    val match = Encuentro(1, "Dragons FC", "Phoenix United", "", "", "0-0", 5)
-    val match2 = Encuentro(2, "Dragons FC", "Phoenix United", "", "", "1-1", 5)
-    val match3 = Encuentro(3, "Dragons FC", "Phoenix United", "", "", "2-0", 5)
-    val match4 = Encuentro(4, "Dragons FC", "Phoenix United", "", "", "0-2", 5)
-
-    val matchList: List<Encuentro> = listOf(match, match2, match3, match4)
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(matchList) { encuentro ->
-            EncuentroCard(
-                encuentro = encuentro,
-                modifier = Modifier,
-                onClick = {}
-            )
         }
     }
 }
