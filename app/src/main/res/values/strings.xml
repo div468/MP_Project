@@ -54,9 +54,8 @@
     <string name="asistencias">A</string>
     <string name="posicion">P</string>
 
-    <!-- EquiposScreen -->
     <string name="list_title_equipos">Listado de Equipos</string>
     <string name="puntos">Puntos: </string>
-    <string name="grupo">Grupo: </string>
+    <string name="grupo">Grupo </string>
     <string name="verJugadores">Ver jugadores</string>
 </resources>
