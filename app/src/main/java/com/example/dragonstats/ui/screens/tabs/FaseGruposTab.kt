@@ -1,5 +1,6 @@
 package com.example.dragonstats.ui.screens.tabs
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -28,7 +29,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +44,7 @@ import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Grupo
 import com.example.dragonstats.ui.viewmodel.GruposUiState
 import com.example.dragonstats.ui.viewmodel.GruposViewModel
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
 fun FaseGruposTab(
@@ -181,11 +185,11 @@ private fun GrupoCard(grupo: Grupo) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(id = R.string.grupo, ) + " " + grupo.nombre,
+                    text = "Equipos",
                     color = Color.White,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.width(140.dp)
+                    modifier = Modifier.width(180.dp)
                 )
 
                 // PJ
@@ -296,10 +300,10 @@ private fun EquipoItem(
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Posición, icono y nombre del equipo (fijo)
+        // Posición, icono de posición, logo del equipo y nombre (fijo)
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.width(140.dp)
+            modifier = Modifier.width(180.dp)
         ) {
             // Posición
             Text(
@@ -310,29 +314,33 @@ private fun EquipoItem(
                 textAlign = TextAlign.Center
             )
 
-            // Icono del equipo con color según posición
-            val iconColor = when (posicion) {
-                1, 2 -> Color(0xFF4CAF50) // Clasifican (verde)
-                3, 4 -> Color(0xFFFF9800) // En peligro (naranja)
-                else -> Color(0xFFF44336) // Eliminados (rojo)
-            }
-
-            Icon(
-                painter = painterResource(id = R.drawable.ic_equipo_default),
-                contentDescription = null,
-                tint = iconColor,
+            // Logo del equipo
+            Box(
                 modifier = Modifier
-                    .size(20.dp)
-                    .padding(start = 4.dp, end = 6.dp)
-            )
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF333333)),
+                contentAlignment = Alignment.Center
+            ) {
+                val logoRes = EquipoLogoHelper.getLogoResource(equipo.nombre)
+                if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                    Image(
+                        painter = painterResource(id = logoRes),
+                        contentDescription = "Logo ${equipo.nombre}",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
 
             // Nombre del equipo
             Text(
                 text = equipo.nombre,
-                color = if (posicion == 1) Color(0xFF4CAF50) else Color.White,
+                color = if (posicion == 1 || posicion == 2) Color(0xFF4CAF50) else Color.White,
                 fontSize = 13.sp,
                 fontWeight = if (posicion == 1) FontWeight.Bold else FontWeight.Normal,
-                maxLines = 1
+                maxLines = 1,
+                modifier = Modifier.padding(start = 6.dp)
             )
         }
 

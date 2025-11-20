@@ -1,5 +1,6 @@
 package com.example.dragonstats.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,11 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,6 +37,7 @@ import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Encuentro
 import com.example.dragonstats.ui.viewmodel.CalendarioViewModel
 import com.example.dragonstats.ui.viewmodel.CalendarioUiState
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
 fun CalendarioScreen(
@@ -46,9 +50,9 @@ fun CalendarioScreen(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Cargar la jornada inicial cuando la pantalla se monta
-    LaunchedEffect(Unit) {
-        viewModel.loadEncuentros(initialJornada)
+    // Cargar los encuentros para la jornada seleccionada
+    LaunchedEffect(selectedJornada) {
+        viewModel.loadEncuentros(selectedJornada)
     }
 
     // Función para hacer scroll a la jornada seleccionada
@@ -100,7 +104,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == jornadaNum,
                             onClick = {
                                 selectedJornada = jornadaNum
-                                viewModel.loadEncuentros(jornadaNum)
                                 scrollToJornada(jornadaNum, state.totalJornadas)
                             }
                         )
@@ -114,7 +117,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == state.totalJornadas + 1,
                             onClick = {
                                 selectedJornada = state.totalJornadas + 1
-                                viewModel.loadEncuentros(state.totalJornadas + 1)
                                 scrollToJornada(state.totalJornadas + 1, state.totalJornadas)
                             }
                         )
@@ -127,7 +129,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == state.totalJornadas + 2,
                             onClick = {
                                 selectedJornada = state.totalJornadas + 2
-                                viewModel.loadEncuentros(state.totalJornadas + 2)
                                 scrollToJornada(state.totalJornadas + 2, state.totalJornadas)
                             }
                         )
@@ -140,7 +141,6 @@ fun CalendarioScreen(
                             isSelected = selectedJornada == state.totalJornadas + 3,
                             onClick = {
                                 selectedJornada = state.totalJornadas + 3
-                                viewModel.loadEncuentros(state.totalJornadas + 3)
                                 scrollToJornada(state.totalJornadas + 3, state.totalJornadas)
                             }
                         )
@@ -336,17 +336,37 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Equipo 1
+            // Equipo 1 - Con ancho máximo definido
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.Start
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_equipo_default),
-                    contentDescription = null,
-                    tint = colorResource(id = R.color.green_calendar),
-                    modifier = Modifier.size(24.dp)
-                )
+                // Logo del equipo 1
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF333333)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo1)
+                    if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                        Image(
+                            painter = painterResource(id = logoRes),
+                            contentDescription = "Logo ${encuentro.equipo1}",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_equipo_default),
+                            contentDescription = null,
+                            tint = colorResource(id = R.color.green_calendar),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
@@ -354,7 +374,11 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                     text = encuentro.equipo1,
                     color = Color.White,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
             }
 
@@ -392,7 +416,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                 }
             }
 
-            // Equipo 2
+            // Equipo 2 - Con ancho máximo definido y alineado a la derecha
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
@@ -402,17 +426,41 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                     text = encuentro.equipo2,
                     color = Color.White,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_equipo_default),
-                    contentDescription = null,
-                    tint = colorResource(id = R.color.green_calendar),
-                    modifier = Modifier.size(24.dp)
-                )
+                // Logo del equipo 2
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF333333)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo2)
+                    if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                        Image(
+                            painter = painterResource(id = logoRes),
+                            contentDescription = "Logo ${encuentro.equipo2}",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_equipo_default),
+                            contentDescription = null,
+                            tint = colorResource(id = R.color.green_calendar),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
         }
     }

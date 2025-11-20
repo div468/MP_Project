@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.dragonstats.data.model.Encuentro
 import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Grupo
+import com.example.dragonstats.data.repository.EncuentroRepository
 import com.example.dragonstats.data.repository.EquipoRepository
+import com.example.dragonstats.ui.screens.GruposTab
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +16,11 @@ import kotlinx.coroutines.launch
 
 sealed class GruposUiState {
     object Loading : GruposUiState()
-    data class Success(val grupos: List<Grupo>, val topTeams: List<Equipo>) : GruposUiState()
+    data class Success(
+        val grupos: List<Grupo>,
+        val topTeams: List<Equipo>,
+        val bracketMatches: Map<String, List<Encuentro>> = emptyMap()
+    ) : GruposUiState()
     data class Error(val message: String) : GruposUiState()
 }
 
@@ -22,56 +29,43 @@ class GruposViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<GruposUiState>(GruposUiState.Loading)
     val uiState: StateFlow<GruposUiState> = _uiState.asStateFlow()
 
-    private val repository = EquipoRepository()
+    private val _selectedTab = MutableStateFlow(GruposTab.FASE_GRUPOS)
+    val selectedTab: StateFlow<GruposTab> = _selectedTab.asStateFlow()
+
+    private val equipoRepository = EquipoRepository()
+    private val encuentroRepository = EncuentroRepository()
 
     init {
-        fetchGrupos()
+        fetchData()
     }
 
-    private fun fetchGrupos() {
+    fun onTabSelected(tab: GruposTab) {
+        _selectedTab.value = tab
+    }
+
+    private fun fetchData() {
         viewModelScope.launch {
             _uiState.value = GruposUiState.Loading
-            repository.getGrupos().onSuccess { grupos ->
+
+            val gruposDeferred = async { equipoRepository.getGrupos() }
+            val bracketDeferred = async { encuentroRepository.getBracketMatches() }
+
+            val gruposResult = gruposDeferred.await()
+            val bracketResult = bracketDeferred.await()
+
+            if (gruposResult.isSuccess && bracketResult.isSuccess) {
+                val grupos = gruposResult.getOrThrow()
+                val bracketMatches = bracketResult.getOrThrow()
                 val topTeams = grupos.flatMap { it.equipos.take(2) }
-                _uiState.value = GruposUiState.Success(grupos, topTeams)
-            }.onFailure { exception ->
-                _uiState.value = GruposUiState.Error(exception.message ?: "Unknown error")
+                _uiState.value = GruposUiState.Success(grupos, topTeams, bracketMatches)
+            } else {
+                val errorMessage = (gruposResult.exceptionOrNull() ?: bracketResult.exceptionOrNull())?.message ?: "Error desconocido"
+                _uiState.value = GruposUiState.Error(errorMessage)
             }
         }
     }
 
     fun retry() {
-        fetchGrupos()
-    }
-
-    fun createQuarterFinals(topTeams: List<Equipo>): List<Encuentro> {
-        val teamsByGroup = topTeams.groupBy { it.grupo }
-
-        val teamA1 = teamsByGroup["A"]?.getOrNull(0) ?: Equipo(nombre = "A1")
-        val teamA2 = teamsByGroup["A"]?.getOrNull(1) ?: Equipo(nombre = "A2")
-        val teamB1 = teamsByGroup["B"]?.getOrNull(0) ?: Equipo(nombre = "B1")
-        val teamB2 = teamsByGroup["B"]?.getOrNull(1) ?: Equipo(nombre = "B2")
-        val teamC1 = teamsByGroup["C"]?.getOrNull(0) ?: Equipo(nombre = "C1")
-        val teamC2 = teamsByGroup["C"]?.getOrNull(1) ?: Equipo(nombre = "C2")
-        val teamD1 = teamsByGroup["D"]?.getOrNull(0) ?: Equipo(nombre = "D1")
-        val teamD2 = teamsByGroup["D"]?.getOrNull(1) ?: Equipo(nombre = "D2")
-
-        return listOf(
-            Encuentro(1, teamA1.nombre, teamD2.nombre, "", "", "0-0", 5),
-            Encuentro(2, teamC1.nombre, teamB2.nombre, "", "", "0-0", 5),
-            Encuentro(3, teamB1.nombre, teamC2.nombre, "", "", "0-0", 5),
-            Encuentro(4, teamD1.nombre, teamA2.nombre, "", "", "0-0", 5),
-        )
-    }
-
-    fun createSemiFinals(): List<Encuentro> {
-        return listOf(
-            Encuentro(5, "TBD", "TBD", "", "", "0-0", 6),
-            Encuentro(6, "TBD", "TBD", "", "", "0-0", 6)
-        )
-    }
-
-    fun createFinal(): Encuentro {
-        return Encuentro(7, "TBD", "TBD", "", "", "0-0", 7)
+        fetchData()
     }
 }

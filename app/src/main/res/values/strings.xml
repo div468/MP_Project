@@ -5,6 +5,7 @@
     <string name="nav_calendario">Calendario</string>
     <string name="nav_grupos">Grupos</string>
     <string name="nav_equipos">Equipos</string>
+    <string name="nav_estadisticas">Estadísticas</string>
 
     <!-- Screens -->
     <string name="screen_calendario">Calendario</string>
@@ -28,12 +29,17 @@
     <!-- CalendarScreen -->
     <string name="calendario_screen_title">Próximos encuentros</string>
 
-    <!-- PatidooScreen -->
+    <!-- PartidoScreen -->
     <string name="partido_screen_title">Descripcion Partido</string>
     <string name="partido_no_encontrado">Partido no encontrado</string>">
     <string name="proximo_partido">Próximo partido</string>">
     <string name="partido_pendiente">Partido pendiente</string>
 
+    <!-- StatisticsScreen -->
+    <string name="estadisticas_title">Estadísticas del Torneo</string>
+    <string name="max_goleador_equipo">Máximo Goleador por Equipo</string>
+    <string name="top10_fase_grupos">Top 10 Goleadores - Fase de Grupos</string>
+    <string name="top10_fase_finales">Top 10 Goleadores - Fase Finales</string>
 
     <!-- ListadoScreen -->
     <string name="back_icon_description">Volver</string>
@@ -48,7 +54,6 @@
     <string name="asistencias">A</string>
     <string name="posicion">P</string>
 
-    <!-- EquiposScreen -->
     <string name="list_title_equipos">Listado de Equipos</string>
     <string name="puntos">Puntos: </string>
     <string name="grupo">Grupo </string>

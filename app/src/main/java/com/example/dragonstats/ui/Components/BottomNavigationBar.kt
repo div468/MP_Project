@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.dragonstats.R
 import com.example.dragonstats.ui.navigation.Screen
@@ -26,8 +27,9 @@ data class BottomNavItem(
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         BottomNavItem(Screen.Calendario, R.drawable.ic_calendar, R.string.nav_calendario),
-        BottomNavItem(Screen.Grupos, R.drawable.ic_schedule, R.string.nav_grupos),
-        BottomNavItem(Screen.EquiposGraph, R.drawable.ic_teams, R.string.nav_equipos)
+        BottomNavItem(Screen.GruposGraph, R.drawable.ic_schedule, R.string.nav_grupos),
+        BottomNavItem(Screen.EquiposGraph, R.drawable.ic_teams, R.string.nav_equipos),
+        BottomNavItem(Screen.Estadisticas, R.drawable.ic_stats, R.string.nav_estadisticas)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -37,14 +39,7 @@ fun BottomNavigationBar(navController: NavController) {
         containerColor = Color(0xFF4CAF50)
     ) {
         items.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { 
-                val route = it.route ?: ""
-                when (item.screen) {
-                    Screen.Calendario -> route.startsWith("calendario")
-                    Screen.Grupos -> route == "grupos" || route.startsWith("grupos/")
-                    else -> route == item.screen.route
-                }
-            } == true
+            val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
 
             NavigationBarItem(
                 icon = {
@@ -56,20 +51,18 @@ fun BottomNavigationBar(navController: NavController) {
                 label = { Text(text = stringResource(id = item.titleRes)) },
                 selected = isSelected,
                 onClick = {
-                    if (!isSelected) {
-                        val route = if (item.screen == Screen.Calendario) {
-                            Screen.Calendario.createRoute(1)
-                        } else {
-                            item.screen.route
-                        }
+                    val route = if (item.screen == Screen.Calendario) {
+                        Screen.Calendario.createRoute(1)
+                    } else {
+                        item.screen.route
+                    }
 
-                        navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
