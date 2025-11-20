@@ -7,6 +7,7 @@ import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Grupo
 import com.example.dragonstats.data.repository.EncuentroRepository
 import com.example.dragonstats.data.repository.EquipoRepository
+import com.example.dragonstats.ui.screens.GruposTab
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,11 +29,18 @@ class GruposViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<GruposUiState>(GruposUiState.Loading)
     val uiState: StateFlow<GruposUiState> = _uiState.asStateFlow()
 
+    private val _selectedTab = MutableStateFlow(GruposTab.FASE_GRUPOS)
+    val selectedTab: StateFlow<GruposTab> = _selectedTab.asStateFlow()
+
     private val equipoRepository = EquipoRepository()
     private val encuentroRepository = EncuentroRepository()
 
     init {
         fetchData()
+    }
+
+    fun onTabSelected(tab: GruposTab) {
+        _selectedTab.value = tab
     }
 
     private fun fetchData() {

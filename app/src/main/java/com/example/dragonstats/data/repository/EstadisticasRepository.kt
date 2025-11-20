@@ -91,7 +91,7 @@ class EstadisticasRepository {
                 )
             )
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Error obteniendo estadísticas: ${e.message}")
+            Log.e(TAG, "Error obteniendo estadísticas: ${e.message}")
             e.printStackTrace()
             Result.failure(e)
         }
