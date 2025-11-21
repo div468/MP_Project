@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,65 +38,90 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.data.model.Jugador
-import com.example.dragonstats.ui.viewmodel.EquiposListadoViewModel
+import com.example.dragonstats.ui.viewmodel.ListadoUiState
+import com.example.dragonstats.ui.viewmodel.ListadoViewModel
 import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
-fun ListadoScreen (e: Equipo, navController: NavController){
+fun ListadoScreen (viewModel: ListadoViewModel, navController: NavController){
+    val uiState by viewModel.uiState.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 10.dp, horizontal = 3.dp)
             .background(MaterialTheme.colorScheme.background)
     ){
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top=15.dp)
-                    .height(25.dp)
-                    .background(Color.Transparent),
-            ){
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.height(25.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back_icon_description),
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.list_title),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 18.sp
-                )
+        when(uiState){
+            is ListadoUiState.Loading ->{
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-
-            DatosEquipo(e)
-
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 5.dp)
-                    .padding(vertical = 30.dp, horizontal = 15.dp)
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(
-                        MaterialTheme.colorScheme.surface,
-                        RoundedCornerShape(12.dp)
+            is ListadoUiState.Error ->{
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = (uiState as ListadoUiState.Error).message,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    .clip(RoundedCornerShape(12.dp))
-            ){
-                TablaJugadores(e.jugadores)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { navController.popBackStack() }) {
+                        Text("Volver")
+                    }
+                }
+            }
+            is ListadoUiState.Success ->{
+                val equipo = (uiState as ListadoUiState.Success).equipo
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top=15.dp)
+                            .height(25.dp)
+                            .background(Color.Transparent),
+                    ){
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.height(25.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back_icon_description),
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.list_title),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 18.sp
+                        )
+                    }
+
+                    DatosEquipo(equipo = equipo, viewModel = viewModel)
+
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp)
+                            .padding(vertical = 30.dp, horizontal = 15.dp)
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clip(RoundedCornerShape(12.dp))
+                    ){
+                        TablaJugadores(equipo.jugadores)
+                    }
+                }
             }
         }
     }
@@ -181,9 +209,9 @@ fun FilaJugador(j:Jugador){
 }
 
 @Composable
-fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()){
-    val equiposFavoritos by viewModel.equiposFavoritos.collectAsState()
-    var isLiked = equiposFavoritos.contains(equipo.nombre)
+fun DatosEquipo(equipo: Equipo, viewModel: ListadoViewModel){
+    val isFavorite by viewModel.isFavorite.collectAsState()
+
     Box(
         modifier = Modifier
             .padding(horizontal = 15.dp)
@@ -242,15 +270,15 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     IconButton(
-                        onClick = { viewModel.toggleFavorito(equipo.nombre) }
+                        onClick = { viewModel.toogleFavorite() }
                     ) {
                         Icon(
-                            painter = if(isLiked)
+                            painter = if(isFavorite)
                                 painterResource(R.drawable.ic_favoritefilled)
                             else
                                 painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
-                            tint = if(isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            tint = if(isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             modifier = Modifier.size(24.dp)
                         )
                     }
