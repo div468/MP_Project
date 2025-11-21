@@ -39,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +63,10 @@ fun TeamBox(teamName: String, logoUrl: String?) {
         Box(
             modifier = Modifier
                 .size(36.dp)
-                .background(Color(0xFF333333), shape = RoundedCornerShape(18.dp)),
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(18.dp)
+                ),
             contentAlignment = Alignment.Center
         ) {
             val logoRes = EquipoLogoHelper.getLogoResource(teamName)
@@ -85,7 +87,7 @@ fun TeamBox(teamName: String, logoUrl: String?) {
 
                 Text(
                     text = initials,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -106,10 +108,10 @@ fun EncuentroCard(
     Box {
         Card(
             modifier = modifier.clickable { onClick() },
-            elevation = CardDefaults.cardElevation(30.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
-                containerColor = colorResource(id = R.color.dark_gray)
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
             Column(
@@ -138,14 +140,14 @@ fun EncuentroCard(
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if (encuentro.penalesEquipo1 != null && encuentro.penalesEquipo2 != null) {
                         Text(
                             text = "(${encuentro.penalesEquipo1}-${encuentro.penalesEquipo2})",
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Normal,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -238,12 +240,12 @@ private fun LoadingStateBracket() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CircularProgressIndicator(
-                color = Color(0xFF4CAF50),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
             Text(
                 text = "Cargando bracket...",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp
             )
         }
@@ -272,20 +274,20 @@ private fun ErrorStateBracket(
             )
             Text(
                 text = "Error al cargar el bracket",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = message,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
@@ -348,7 +350,7 @@ private fun BracketContent(
                     text = round.phase,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 CenteredMatchRow(round.encuentros, teamLogoMap, navController = navController)
@@ -362,7 +364,7 @@ private fun BracketContent(
                 text = stringResource(id = R.string.header_phase4),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Black,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(12.dp))
             EncuentroCard(
@@ -371,7 +373,7 @@ private fun BracketContent(
                 isFinalMatch = true,
                 modifier = Modifier
                     .width(120.dp)
-                    .height(100.dp), 
+                    .height(100.dp),
                 onClick = {
                     navController.navigate("grupos/partido/${finalMatch.id}")
                 }
@@ -389,7 +391,7 @@ private fun BracketContent(
                     text = round.phase,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 CenteredMatchRow(round.encuentros, teamLogoMap, navController = navController)

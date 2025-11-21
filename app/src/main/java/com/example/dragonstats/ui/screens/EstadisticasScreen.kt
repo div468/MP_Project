@@ -27,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -60,13 +61,13 @@ fun EstadisticasScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
             .padding(top = 24.dp)
     ) {
         // Header
         Text(
             text = stringResource(id = R.string.estadisticas_title),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
@@ -170,12 +171,12 @@ private fun LoadingStateEstadisticas() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CircularProgressIndicator(
-                color = Color(0xFF4CAF50),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
             Text(
                 text = "Cargando estadísticas...",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp
             )
         }
@@ -204,20 +205,20 @@ private fun ErrorStateEstadisticas(
             )
             Text(
                 text = "Error al cargar estadísticas",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = message,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
@@ -233,7 +234,7 @@ private fun ErrorStateEstadisticas(
 private fun SectionHeader(title: String) {
     Text(
         text = title,
-        color = Color(0xFF4CAF50),
+        color = MaterialTheme.colorScheme.primary,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(vertical = 8.dp)
@@ -255,7 +256,7 @@ private fun SectionHeaderWithExpand(
     ) {
         Text(
             text = title,
-            color = Color(0xFF4CAF50),
+            color = MaterialTheme.colorScheme.primary,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
@@ -267,7 +268,7 @@ private fun SectionHeaderWithExpand(
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = if (isExpanded) "Mostrar menos" else "Mostrar todos",
-                tint = Color(0xFF4CAF50),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -280,7 +281,7 @@ private fun MaxGoleadoresPorEquipoCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -299,13 +300,13 @@ private fun MaxGoleadoresPorEquipoCard(
                     ) {
                         Text(
                             text = equipo,
-                            color = Color(0xFF4CAF50),
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = goleador.nombreJugador,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 13.sp
                         )
                     }
@@ -320,7 +321,7 @@ private fun MaxGoleadoresPorEquipoCard(
                         )
                         Text(
                             text = goleador.goles.toString(),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -337,13 +338,6 @@ private fun GoleadorCard(
     goleador: Goleador,
     isPlayoffs: Boolean = false
 ) {
-    val backgroundColor = when (posicion) {
-        1 -> Color(0xFF2D2D2D)
-        2 -> Color(0xFF252525)
-        3 -> Color(0xFF1F1F1F)
-        else -> Color(0xFF1A1A1A)
-    }
-
     val medalColor = when (posicion) {
         1 -> Color(0xFFFFD700) // Oro
         2 -> Color(0xFFC0C0C0) // Plata
@@ -353,11 +347,9 @@ private fun GoleadorCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (posicion <= 3) 6.dp else 2.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier
@@ -371,14 +363,14 @@ private fun GoleadorCard(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        if (posicion <= 3) medalColor else Color(0xFF333333),
+                        if (posicion <= 3) medalColor else MaterialTheme.colorScheme.surfaceVariant,
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = posicion.toString(),
-                    color = if (posicion <= 3) Color.Black else Color.White,
+                    color = if (posicion <= 3) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -392,13 +384,13 @@ private fun GoleadorCard(
             ) {
                 Text(
                     text = goleador.nombreJugador,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = if (posicion <= 3) FontWeight.Bold else FontWeight.Medium
                 )
                 Text(
                     text = goleador.nombreEquipo,
-                    color = if (isPlayoffs) Color(0xFFFFD700) else Color(0xFF4CAF50),
+                    color = if (isPlayoffs) Color(0xFFFFD700) else MaterialTheme.colorScheme.primary,
                     fontSize = 13.sp
                 )
             }
@@ -414,7 +406,7 @@ private fun GoleadorCard(
                 )
                 Text(
                     text = goleador.goles.toString(),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )

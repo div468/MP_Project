@@ -52,23 +52,23 @@ fun PartidoDetailsScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black),
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color(0xFF4CAF50))
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
         is PartidoUiState.Error -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black),
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = state.message,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 18.sp
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -89,7 +89,6 @@ fun PartidoDetailsScreen(
     }
 }
 
-// Función helper para obtener el nombre de la fase
 private fun getFaseNombre(jornada: Int, totalJornadas: Int): String {
     return when (jornada) {
         totalJornadas + 1 -> "Cuartos de Final"
@@ -110,44 +109,43 @@ private fun PartidoDetailsContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Barra de navegación superior con label de jornada o fase
-        TopAppBar(
-            title = {
-                Text(
-                    text = getFaseNombre(encuentro.jornada, totalJornadas),
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
+        // Header personalizado sin TopAppBar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 4.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { onBackClick(matchId) }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Regresar",
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = { onBackClick(matchId) },
-                    modifier = Modifier.padding(start = 4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Regresar",
-                        tint = Color.White
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Black
+            }
+
+            Text(
+                text = getFaseNombre(encuentro.jornada, totalJornadas),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 8.dp)
             )
-        )
+        }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .padding(horizontal = 20.dp, vertical = 8.dp)
         ) {
-            // Match result section in card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0x66424242)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
@@ -157,11 +155,8 @@ private fun PartidoDetailsContent(
                 )
             }
 
-            // ===== ESPACIADO AGREGADO =====
             Spacer(modifier = Modifier.height(16.dp))
-            // ===== FIN ESPACIADO =====
 
-            // Solo mostrar eventos si el partido tiene resultado
             if (encuentro.tieneResultado && encuentro.eventos.isNotEmpty()) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -175,7 +170,6 @@ private fun PartidoDetailsContent(
                     }
                 }
             } else if (!encuentro.tieneResultado) {
-                // Si no hay resultado, mostrar mensaje
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -185,14 +179,14 @@ private fun PartidoDetailsContent(
                     ) {
                         Text(
                             text = if (encuentro.hora != null) "Próximo partido" else "Partido pendiente",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium
                         )
                         if (encuentro.hora != null) {
                             Text(
                                 text = "${encuentro.fecha} - ${encuentro.hora}",
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 fontSize = 14.sp
                             )
                         }
@@ -203,8 +197,6 @@ private fun PartidoDetailsContent(
     }
 }
 
-
-// Función helper para obtener solo primer nombre y primer apellido
 private fun getNombreCorto(nombreCompleto: String): String {
     val partes = nombreCompleto.trim().split(" ")
     return when {
@@ -213,7 +205,6 @@ private fun getNombreCorto(nombreCompleto: String): String {
         else -> nombreCompleto
     }
 }
-
 
 @Composable
 private fun MatchHeader(
@@ -224,21 +215,18 @@ private fun MatchHeader(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Resultado principal o información del partido
-        // Resultado principal o información del partido
         if (encuentro.tieneResultado) {
             Text(
                 text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
             )
 
-            // Mostrar penales solo si existen
             if (encuentro.penalesEquipo1 != null && encuentro.penalesEquipo2 != null) {
                 Text(
                     text = "(${encuentro.penalesEquipo1}-${encuentro.penalesEquipo2})",
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Normal
                 )
@@ -247,7 +235,7 @@ private fun MatchHeader(
             val horaDisplay = encuentro.hora ?: "--:--"
             Text(
                 text = horaDisplay,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -257,13 +245,12 @@ private fun MatchHeader(
 
         Text(
             text = encuentro.fecha,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Equipos
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -277,7 +264,7 @@ private fun MatchHeader(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF333333)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo1)
@@ -291,7 +278,7 @@ private fun MatchHeader(
                     } else {
                         Text(
                             text = encuentro.equipo1.first().toString(),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -302,7 +289,7 @@ private fun MatchHeader(
 
                 Text(
                     text = encuentro.equipo1.ifEmpty { "Equipo 1" },
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -316,7 +303,7 @@ private fun MatchHeader(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF333333)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo2)
@@ -330,7 +317,7 @@ private fun MatchHeader(
                     } else {
                         Text(
                             text = encuentro.equipo2.first().toString(),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -341,7 +328,7 @@ private fun MatchHeader(
 
                 Text(
                     text = encuentro.equipo2.ifEmpty { "Equipo 2" },
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -349,7 +336,6 @@ private fun MatchHeader(
         }
     }
 }
-
 
 @Composable
 private fun EventItem(
@@ -363,7 +349,7 @@ private fun EventItem(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Color(0xFF1A1A1A),
+                MaterialTheme.colorScheme.surface,
                 RoundedCornerShape(8.dp)
             )
             .padding(12.dp),
@@ -372,62 +358,36 @@ private fun EventItem(
             Arrangement.Start else Arrangement.End
     ) {
         if (event.team == Team.HOME) {
-            // Equipo local - alineado a la izquierda
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                // Minuto y nombre
                 Text(
                     text = "${event.minute} $nombreCorto",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Icono del evento
                 EventIcon(eventType = event.eventType)
             }
         } else {
-            // Equipo visitante - alineado a la derecha
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Icono del evento
                 EventIcon(eventType = event.eventType)
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Minuto y nombre
                 Text(
                     text = "$nombreCorto ${event.minute}",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
-
             }
         }
-    }
-}
-
-@Composable
-private fun PlayerAvatar(playerName: String) {
-    Box(
-        modifier = Modifier
-            .size(32.dp)
-            .clip(CircleShape)
-            .background(Color(0xFF4CAF50)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = playerName.firstOrNull()?.uppercase() ?: "?",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 
@@ -435,7 +395,6 @@ private fun PlayerAvatar(playerName: String) {
 private fun EventIcon(eventType: EventType) {
     when (eventType) {
         EventType.GOAL -> {
-            // Ícono de gol (pelota de fútbol)
             Box(
                 modifier = Modifier
                     .size(28.dp)
@@ -449,7 +408,6 @@ private fun EventIcon(eventType: EventType) {
             }
         }
         EventType.YELLOW_CARD -> {
-            // Tarjeta amarilla
             Box(
                 modifier = Modifier
                     .size(18.dp, 24.dp)
@@ -457,51 +415,10 @@ private fun EventIcon(eventType: EventType) {
             )
         }
         EventType.RED_CARD -> {
-            // Tarjeta roja
             Box(
                 modifier = Modifier
                     .size(18.dp, 24.dp)
                     .background(Color(0xFFF44336), RoundedCornerShape(3.dp))
-            )
-        }
-    }
-}
-
-@Composable
-private fun StatItem(
-    label: String,
-    homeValue: String,
-    awayValue: String
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = label,
-            color = Color.Gray,
-            fontSize = 12.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = homeValue,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "-",
-                color = Color.Gray,
-                fontSize = 16.sp
-            )
-            Text(
-                text = awayValue,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
             )
         }
     }

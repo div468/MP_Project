@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,18 +49,16 @@ fun CalendarioScreen(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Cargar los encuentros para la jornada seleccionada
     LaunchedEffect(selectedJornada) {
         viewModel.loadEncuentros(selectedJornada)
     }
 
-    // Función para hacer scroll a la jornada seleccionada
     fun scrollToJornada(jornada: Int, totalJornadas: Int) {
         coroutineScope.launch {
             val index = if (jornada <= totalJornadas) {
-                jornada - 1 // Jornadas regulares
+                jornada - 1
             } else {
-                totalJornadas + (jornada - totalJornadas - 1) // Fases finales
+                totalJornadas + (jornada - totalJornadas - 1)
             }
             listState.animateScrollToItem(index)
         }
@@ -70,13 +67,12 @@ fun CalendarioScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
             .padding(top = 24.dp)
     ) {
-        // Header
         Text(
             text = stringResource(id = R.string.calendario_screen_title),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
@@ -87,7 +83,6 @@ fun CalendarioScreen(
                 LoadingStateCalendario()
             }
             is CalendarioUiState.Success -> {
-                // Navbar horizontal
                 LazyRow(
                     state = listState,
                     modifier = Modifier
@@ -96,7 +91,6 @@ fun CalendarioScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
-                    // Jornadas regulares
                     items(state.totalJornadas) { index ->
                         val jornadaNum = index + 1
                         JornadaTab(
@@ -109,7 +103,6 @@ fun CalendarioScreen(
                         )
                     }
 
-                    // Fases finales (después de las jornadas regulares)
                     item {
                         FaseTab(
                             fase = "Cuartos",
@@ -149,7 +142,6 @@ fun CalendarioScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Lista de encuentros
                 if (state.encuentros.isEmpty()) {
                     EmptyStateCalendario()
                 } else {
@@ -190,12 +182,12 @@ private fun LoadingStateCalendario() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CircularProgressIndicator(
-                color = Color(0xFF4CAF50),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
             Text(
                 text = "Cargando encuentros...",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp
             )
         }
@@ -210,7 +202,7 @@ private fun EmptyStateCalendario() {
     ) {
         Text(
             text = "No hay encuentros programados",
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             fontSize = 16.sp,
             textAlign = TextAlign.Center
         )
@@ -239,25 +231,25 @@ private fun ErrorStateCalendario(
             )
             Text(
                 text = "Error al cargar encuentros",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = message,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
                     text = "Reintentar",
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -270,8 +262,16 @@ private fun JornadaTab(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFF4CAF50) else Color(0xFF1A1A1A)
-    val textColor = if (isSelected) Color.White else Color.Gray
+    val backgroundColor = if (isSelected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    val textColor = if (isSelected) {
+        MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Box(
         modifier = Modifier
@@ -298,8 +298,8 @@ private fun FaseTab(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFFFD700) else Color(0xFF1A1A1A)
-    val textColor = if (isSelected) Color.Black else Color.Gray
+    val backgroundColor = if (isSelected) Color(0xFFFFD700) else MaterialTheme.colorScheme.surfaceVariant
+    val textColor = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
 
     Box(
         modifier = Modifier
@@ -325,7 +325,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onPartidoClick() },
-        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.dark_gray)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -336,18 +336,16 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Equipo 1 - Con ancho máximo definido
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.Start
             ) {
-                // Logo del equipo 1
                 Box(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF333333)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo1)
@@ -362,7 +360,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_equipo_default),
                             contentDescription = null,
-                            tint = colorResource(id = R.color.green_calendar),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -372,7 +370,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
 
                 Text(
                     text = encuentro.equipo1,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
@@ -382,7 +380,6 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                 )
             }
 
-            // Información central
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -390,13 +387,13 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                 if (encuentro.tieneResultado) {
                     Text(
                         text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "Final",
-                        color = Color(0xFF4CAF50),
+                        color = MaterialTheme.colorScheme.primary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -404,19 +401,18 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                     val horaDisplay = encuentro.hora ?: "--:--"
                     Text(
                         text = horaDisplay,
-                        color = if (horaDisplay != "--:--") Color.White else Color.Gray,
+                        color = if (horaDisplay != "--:--") MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = encuentro.fecha,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         fontSize = 12.sp
                     )
                 }
             }
 
-            // Equipo 2 - Con ancho máximo definido y alineado a la derecha
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
@@ -424,7 +420,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
             ) {
                 Text(
                     text = encuentro.equipo2,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
@@ -436,12 +432,11 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Logo del equipo 2
                 Box(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF333333)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo2)
@@ -456,7 +451,7 @@ private fun EncuentroCard(encuentro: Encuentro, onPartidoClick: () -> Unit) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_equipo_default),
                             contentDescription = null,
-                            tint = colorResource(id = R.color.green_calendar),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                     }

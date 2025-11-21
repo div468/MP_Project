@@ -1,6 +1,7 @@
 package com.example.dragonstats.ui.components
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -36,7 +37,7 @@ fun BottomNavigationBar(navController: NavController) {
     val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
-        containerColor = Color(0xFF4CAF50)
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         items.forEach { item ->
             val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
@@ -66,8 +67,8 @@ fun BottomNavigationBar(navController: NavController) {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    selectedTextColor = Color.White,
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
                     unselectedIconColor = Color(0xFF888888),
                     unselectedTextColor = Color(0xFF888888),
                     indicatorColor = Color.Transparent

@@ -23,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -83,12 +84,12 @@ private fun LoadingState() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CircularProgressIndicator(
-                color = Color(0xFF4CAF50),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
             Text(
                 text = "Cargando grupos...",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp
             )
         }
@@ -117,20 +118,20 @@ private fun ErrorState(
             )
             Text(
                 text = "Error al cargar los datos",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = message,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
@@ -162,7 +163,7 @@ private fun GrupoCard(grupo: Grupo) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -171,7 +172,7 @@ private fun GrupoCard(grupo: Grupo) {
         ) {
             Text(
                 text = stringResource(id = R.string.grupo) + " " + grupo.nombre,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -186,86 +187,78 @@ private fun GrupoCard(grupo: Grupo) {
             ) {
                 Text(
                     text = "Equipos",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.width(180.dp)
                 )
 
-                // PJ
                 Text(
                     text = "J",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // PG
                 Text(
                     text = "G",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // PE
                 Text(
                     text = "E",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // PP
                 Text(
                     text = "P",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // GF
                 Text(
                     text = "GF",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // GC
                 Text(
                     text = "GC",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // DG
                 Text(
                     text = "DG",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.width(40.dp)
                 )
 
-                // PTS
                 Text(
                     text = "PTS",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -273,7 +266,6 @@ private fun GrupoCard(grupo: Grupo) {
                 )
             }
 
-            // Lista de equipos con el mismo scroll state
             Column {
                 grupo.equipos.forEachIndexed { index, equipo ->
                     EquipoItem(
@@ -300,26 +292,23 @@ private fun EquipoItem(
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Posición, icono de posición, logo del equipo y nombre (fijo)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.width(180.dp)
         ) {
-            // Posición
             Text(
                 text = posicion.toString(),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 13.sp,
                 modifier = Modifier.width(20.dp),
                 textAlign = TextAlign.Center
             )
 
-            // Logo del equipo
             Box(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF333333)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 val logoRes = EquipoLogoHelper.getLogoResource(equipo.nombre)
@@ -333,10 +322,9 @@ private fun EquipoItem(
                 }
             }
 
-            // Nombre del equipo
             Text(
                 text = equipo.nombre,
-                color = if (posicion == 1 || posicion == 2) Color(0xFF4CAF50) else Color.White,
+                color = if (posicion == 1 || posicion == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                 fontSize = 13.sp,
                 fontWeight = if (posicion == 1) FontWeight.Bold else FontWeight.Normal,
                 maxLines = 1,
@@ -344,26 +332,23 @@ private fun EquipoItem(
             )
         }
 
-        // PJ - Partidos Jugados
         Text(
             text = equipo.partidos.toString(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
 
-        // PG - Partidos Ganados
         Text(
             text = equipo.ganados.toString(),
-            color = Color(0xFF4CAF50),
+            color = MaterialTheme.colorScheme.primary,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
 
-        // PE - Partidos Empatados
         Text(
             text = equipo.empatados.toString(),
             color = Color(0xFFFFEB3B),
@@ -372,7 +357,6 @@ private fun EquipoItem(
             modifier = Modifier.width(40.dp)
         )
 
-        // PP - Partidos Perdidos
         Text(
             text = equipo.perdidos.toString(),
             color = Color(0xFFF44336),
@@ -381,29 +365,26 @@ private fun EquipoItem(
             modifier = Modifier.width(40.dp)
         )
 
-        // GF - Goles a Favor
         Text(
             text = equipo.golesFavor.toString(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
 
-        // GC - Goles en Contra
         Text(
             text = equipo.golesContra.toString(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
 
-        // DG - Diferencia de Goles
         val dgColor = when {
-            equipo.golDiferencia > 0 -> Color(0xFF4CAF50)
+            equipo.golDiferencia > 0 -> MaterialTheme.colorScheme.primary
             equipo.golDiferencia < 0 -> Color(0xFFF44336)
-            else -> Color.White
+            else -> MaterialTheme.colorScheme.onSurface
         }
         Text(
             text = if (equipo.golDiferencia > 0) "+${equipo.golDiferencia}" else equipo.golDiferencia.toString(),
@@ -414,10 +395,9 @@ private fun EquipoItem(
             modifier = Modifier.width(40.dp)
         )
 
-        // PTS - Puntos
         Text(
             text = equipo.puntos.toString(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,7 +44,7 @@ fun GruposScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
             .padding(top = 24.dp)
     ) {
         CustomTabRow(
@@ -92,7 +93,7 @@ private fun CustomTab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (selected) Color(0xFF4CAF50) else Color(0xFF1A1A1A)
+    val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
 
     Box(
         modifier = modifier
@@ -104,7 +105,7 @@ private fun CustomTab(
     ) {
         Text(
             text = text,
-            color = Color.White,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )

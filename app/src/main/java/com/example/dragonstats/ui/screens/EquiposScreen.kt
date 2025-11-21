@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -57,11 +58,12 @@ fun EquiposScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp)
     ){
         Text(
             text = stringResource(id = R.string.list_title_equipos),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -106,12 +108,12 @@ private fun LoadingStateListE() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CircularProgressIndicator(
-                color = Color(0xFF4CAF50),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
             Text(
                 text = "Cargando equipos...",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp
             )
         }
@@ -134,20 +136,20 @@ private fun ErrorStateListE(
         ) {
             Text(
                 text = "Error al cargar los datos",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = message,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
@@ -195,7 +197,7 @@ private fun EquipoCard(
 ){
     Card(
         modifier = Modifier.fillMaxSize(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ){
@@ -210,7 +212,7 @@ private fun EquipoCard(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF333333)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -235,7 +237,7 @@ private fun EquipoCard(
                 ) {
                     Text(
                         text = equipo.nombre,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f).padding(end = 8.dp)
@@ -243,7 +245,7 @@ private fun EquipoCard(
                     Button(
                         onClick = onVerJugadores,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50),
+                            containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.Black
                         ),
                         shape = RoundedCornerShape(8.dp),
@@ -265,12 +267,12 @@ private fun EquipoCard(
                 ) { //Informacion de los equipos
                     Text(
                         text = stringResource(R.string.puntos)+ " " + equipo.puntos,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
                     )
                     Text(
                         text = stringResource(R.string.grupo)+ " " + equipo.grupo,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
                     )
                     //boton para equipos favoritos
@@ -284,7 +286,7 @@ private fun EquipoCard(
                             else
                                 painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
-                            tint = if(isFavorito) Color(0xFF4CAF50) else Color(0xFF4CAF50),
+                            tint = if(isFavorito) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     }

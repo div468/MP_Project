@@ -45,44 +45,52 @@ import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
 fun ListadoScreen (e: Equipo, navController: NavController){
-    Box( //Contenedor de la vista
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
             .padding(vertical = 10.dp, horizontal = 3.dp)
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
     ){
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Row( //Contenedor del botón de retroceso y título
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top=15.dp)
                     .height(25.dp)
                     .background(Color.Transparent),
-
-                ){
+            ){
                 IconButton(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier.height(25.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back_icon_description)
+                        contentDescription = stringResource(R.string.back_icon_description),
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
                     text = stringResource(R.string.list_title),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 18.sp
                 )
             }
 
             DatosEquipo(e)
 
-            Box(//Contenedor con la tabla de los jugadores
-                modifier = Modifier.padding(horizontal = 5.dp)
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 5.dp)
                     .padding(vertical = 30.dp, horizontal = 15.dp)
-                    .fillMaxWidth().weight(1f)
-                    .background(Color(0xFF1A1A1A),RoundedCornerShape(12.dp))
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .background(
+                        MaterialTheme.colorScheme.surface,
+                        RoundedCornerShape(12.dp)
+                    )
                     .clip(RoundedCornerShape(12.dp))
             ){
                 TablaJugadores(e.jugadores)
@@ -96,34 +104,34 @@ fun Encabezados(){
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.DarkGray)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(5.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(
             text = stringResource(R.string.jugador),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(2.25f).padding(start = 5.dp),
             textAlign = TextAlign.Start
         )
         Text(
-            text = stringResource(R.string.goles), //Goles
-            color = Color.White,
+            text = stringResource(R.string.goles),
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1.5f),
             textAlign = TextAlign.Center
         )
         Text(
-            text = stringResource(R.string.asistencias), //Asistencias
-            color = Color.White,
+            text = stringResource(R.string.asistencias),
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1.25f),
             textAlign = TextAlign.Center
         )
         Text(
             text = stringResource(R.string.posicion),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1.85f),
             textAlign = TextAlign.Center
@@ -140,31 +148,31 @@ fun FilaJugador(j:Jugador){
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Columna Jugador
         Text(
             text = j.nombre,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(2.25f),
             textAlign = TextAlign.Start
         )
 
-        // Columna Goles
         Text(
             text = j.goles.toString(),
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1.5f),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold
         )
 
-        // Columna Asistencias
         Text(
             text = j.asistencias.toString(),
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1.25f),
             textAlign = TextAlign.Center
         )
 
-        // Columna Posición
         Text(
             text = j.posicion,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1.85f),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall
@@ -175,23 +183,29 @@ fun FilaJugador(j:Jugador){
 @Composable
 fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()){
     val equiposFavoritos by viewModel.equiposFavoritos.collectAsState()
-    var isLiked = equiposFavoritos.contains(equipo.nombre) //Se verifica si el equipo está agregado como favorito de manera local
-    Box( //Contenedor con los datos del equipo
-        modifier = Modifier.padding(horizontal = 15.dp)
+    var isLiked = equiposFavoritos.contains(equipo.nombre)
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 15.dp)
             .padding(top = 30.dp)
             .fillMaxWidth()
-            .height(150.dp).background(Color(0xFF1A1A1A),RoundedCornerShape(12.dp))
+            .height(150.dp)
+            .background(
+                MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(12.dp)
+            )
     ){
         Row(
-            modifier = Modifier.fillMaxSize().padding(top = 0.dp, start = 10.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 0.dp, start = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
-            // Logo del equipo
             Box(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF333333)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -203,24 +217,29 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
             }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(vertical=20.dp, horizontal = 10.dp ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical=20.dp, horizontal = 10.dp),
                 verticalArrangement = Arrangement.Center
-            ){ //Datos generales del equipo
+            ){
                 Text(
                     text = equipo.nombre,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 25.sp
                 )
                 Text(
                     text = stringResource(R.string.ganados)+ " " + equipo.ganados +
                             " " + stringResource(R.string.empatados) + " " + equipo.empatados +
-                            " " + stringResource(R.string.perdidos) + " " + equipo.perdidos
+                            " " + stringResource(R.string.perdidos) + " " + equipo.perdidos,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(R.string.ptsTotal) + " " + equipo.puntos
+                        text = stringResource(R.string.ptsTotal) + " " + equipo.puntos,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     IconButton(
                         onClick = { viewModel.toggleFavorito(equipo.nombre) }
@@ -231,13 +250,12 @@ fun DatosEquipo(equipo: Equipo, viewModel: EquiposListadoViewModel = viewModel()
                             else
                                 painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
-                            tint = if(isLiked) Color(0xFF4CAF50) else Color.Gray,
+                            tint = if(isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             modifier = Modifier.size(24.dp)
                         )
                     }
                 }
             }
-
         }
     }
 }
@@ -253,7 +271,7 @@ fun TablaJugadores(jugadores: List<Jugador>){
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 4.dp),
                         thickness = 1.dp,
-                        color = Color(0xFF333333)
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
             }
