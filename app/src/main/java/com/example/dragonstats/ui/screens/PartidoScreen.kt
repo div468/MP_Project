@@ -220,6 +220,7 @@ private fun MatchHeader(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Resultado principal o información del partido
+        // Resultado principal o información del partido
         if (encuentro.tieneResultado) {
             Text(
                 text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
@@ -227,6 +228,16 @@ private fun MatchHeader(
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
             )
+
+            // Mostrar penales solo si existen
+            if (encuentro.penalesEquipo1 != null && encuentro.penalesEquipo2 != null) {
+                Text(
+                    text = "(${encuentro.penalesEquipo1}-${encuentro.penalesEquipo2})",
+                    color = Color.Gray,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            }
         } else {
             val horaDisplay = encuentro.hora ?: "--:--"
             Text(
