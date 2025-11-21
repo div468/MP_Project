@@ -91,7 +91,6 @@ fun EquiposScreen(
                 .padding(vertical = 8.dp)
         )
 
-
         when (uiState){
             is EquiposUiState.Loading -> {
                 LoadingStateListE()
@@ -131,8 +130,8 @@ private fun TipoOrdenMenu(
             onClick = { expanded = true },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF333333),
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
@@ -143,10 +142,10 @@ private fun TipoOrdenMenu(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
-                text = tipoActual.toText(),
-                fontSize = 14.sp,
+                    text = tipoActual.toText(),
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
-            )
+                )
                 Icon(
                     painter = painterResource(android.R.drawable.arrow_down_float),
                     contentDescription = null,
@@ -159,14 +158,18 @@ private fun TipoOrdenMenu(
             onDismissRequest = {expanded = false },
             modifier = Modifier
                 .width(IntrinsicSize.Max)
-                .background(Color(0xFF1A1A1A))
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             TipoOrden.entries.forEach {tipo ->
                 DropdownMenuItem(
                     text = {
                         Text(
                             text = tipo.toText(),
-                            color = if(tipo == tipoActual) Color(0xFF4CAF50) else Color.White,
+                            color = if(tipo == tipoActual) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
@@ -179,6 +182,7 @@ private fun TipoOrdenMenu(
         }
     }
 }
+
 @Composable
 private fun LoadingStateListE() {
     Box(
@@ -236,7 +240,7 @@ private fun ErrorStateListE(
             ) {
                 Text(
                     text = "Reintentar",
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -330,7 +334,7 @@ private fun EquipoCard(
                         onClick = onVerJugadores,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = Color.Black
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
@@ -370,7 +374,7 @@ private fun EquipoCard(
                             else
                                 painterResource(R.drawable.ic_favorite_screen),
                             contentDescription = null,
-                            tint = if(isFavorito) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
