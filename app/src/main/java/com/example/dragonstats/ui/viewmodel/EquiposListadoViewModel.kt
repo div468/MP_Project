@@ -109,12 +109,12 @@ class EquiposListadoViewModel(
             TipoOrden.NOMBREDESCENDENTE -> {
                 equiposOriginal.sortedBy { it.nombre }.reversed()
             }
-            TipoOrden.PTSASCENDENTE -> {
+            TipoOrden.PTSDESCENDENTE -> {
                 equiposOriginal.sortedWith (
                     compareByDescending {it.puntos}
                 )
             }
-            TipoOrden.PTSDESCENDENTE -> {
+            TipoOrden.PTSASCENDENTE -> {
                 equiposOriginal.sortedWith(
                     compareBy {it.puntos}
                 )
