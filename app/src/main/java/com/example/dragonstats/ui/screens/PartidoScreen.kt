@@ -1,32 +1,37 @@
 package com.example.dragonstats.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.dragonstats.data.model.PlayerEvent
-import com.example.dragonstats.data.model.EventType
-import com.example.dragonstats.data.model.Team
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.dragonstats.R
 import com.example.dragonstats.data.model.Encuentro
+import com.example.dragonstats.data.model.EventType
+import com.example.dragonstats.data.model.PlayerEvent
+import com.example.dragonstats.data.model.Team
 import com.example.dragonstats.ui.viewmodel.PartidoUiState
 import com.example.dragonstats.ui.viewmodel.PartidoViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import com.example.dragonstats.utils.EquipoLogoHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -220,6 +225,7 @@ private fun MatchHeader(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Resultado principal o información del partido
+        // Resultado principal o información del partido
         if (encuentro.tieneResultado) {
             Text(
                 text = "${encuentro.golesEquipo1} - ${encuentro.golesEquipo2}",
@@ -227,6 +233,16 @@ private fun MatchHeader(
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold
             )
+
+            // Mostrar penales solo si existen
+            if (encuentro.penalesEquipo1 != null && encuentro.penalesEquipo2 != null) {
+                Text(
+                    text = "(${encuentro.penalesEquipo1}-${encuentro.penalesEquipo2})",
+                    color = Color.Gray,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            }
         } else {
             val horaDisplay = encuentro.hora ?: "--:--"
             Text(
@@ -261,15 +277,25 @@ private fun MatchHeader(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(Color.Gray),
+                        .background(Color(0xFF333333)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = encuentro.equipo1.firstOrNull()?.uppercase() ?: "?",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo1)
+                    if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                        Image(
+                            painter = painterResource(id = logoRes),
+                            contentDescription = "Logo ${encuentro.equipo1}",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(70.dp)
+                        )
+                    } else {
+                        Text(
+                            text = encuentro.equipo1.first().toString(),
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -290,15 +316,25 @@ private fun MatchHeader(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(Color.Gray),
+                        .background(Color(0xFF333333)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = encuentro.equipo2.firstOrNull()?.uppercase() ?: "?",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    val logoRes = EquipoLogoHelper.getLogoResource(encuentro.equipo2)
+                    if (logoRes != 0 && logoRes != R.drawable.ic_equipo_default) {
+                        Image(
+                            painter = painterResource(id = logoRes),
+                            contentDescription = "Logo ${encuentro.equipo2}",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(70.dp)
+                        )
+                    } else {
+                        Text(
+                            text = encuentro.equipo2.first().toString(),
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
