@@ -1,8 +1,10 @@
 package com.example.dragonstats.ui.navigation
 
+import android.app.Application
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -19,6 +21,7 @@ import com.example.dragonstats.ui.screens.GruposScreen
 import com.example.dragonstats.ui.screens.ListadoScreen
 import com.example.dragonstats.ui.screens.PartidoDetailsScreen
 import com.example.dragonstats.ui.viewmodel.GruposViewModel
+import com.example.dragonstats.ui.viewmodel.ListadoViewModel
 
 sealed class Screen(val route: String, val title: String) {
     object Calendario : Screen("calendario/{jornada}", "Calendario") {
@@ -124,7 +127,15 @@ fun NavGraphBuilder.equiposGraph(navController: NavHostController) {
                 ?.get<Equipo>("selectedEquipo")
                 ?: return@composable
 
-            ListadoScreen(e = equipo, navController = navController)
+            val context = LocalContext.current
+            val viewModel = remember {
+                ListadoViewModel(
+                    application = (context.applicationContext as Application),
+                    equipo = equipo
+                )
+            }
+
+            ListadoScreen(viewModel = viewModel, navController = navController)
         }
     }
 }
