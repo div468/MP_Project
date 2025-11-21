@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +24,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,8 +47,12 @@ import com.example.dragonstats.data.model.Equipo
 import com.example.dragonstats.ui.viewmodel.EquiposUiState
 import com.example.dragonstats.ui.viewmodel.EquiposListadoViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.dragonstats.ui.viewmodel.TipoOrden
 import com.example.dragonstats.utils.EquipoLogoHelper
 
 @Composable
@@ -54,6 +62,7 @@ fun EquiposScreen(
 ){
     val uiState by viewModel.uiState.collectAsState()
     val equiposFavoritos by viewModel.equiposFavoritos.collectAsState()
+    val tipoOrdenActual by viewModel.tipoOrden.collectAsState()
 
     Column(
         modifier = Modifier
@@ -69,8 +78,20 @@ fun EquiposScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Left
         )
+
+        TipoOrdenMenu(
+            tipoActual = tipoOrdenActual,
+            onTipoSeleccionado = { nuevoTipo ->
+                viewModel.cambiardeOrden(nuevoTipo)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        )
+
+
         when (uiState){
             is EquiposUiState.Loading -> {
                 LoadingStateListE()
@@ -97,6 +118,67 @@ fun EquiposScreen(
     }
 }
 
+@Composable
+private fun TipoOrdenMenu(
+    tipoActual : TipoOrden,
+    onTipoSeleccionado : (TipoOrden) -> Unit,
+    modifier: Modifier = Modifier
+){
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier.wrapContentWidth(Alignment.End)){
+        Button(
+            onClick = { expanded = true },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF333333),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                text = tipoActual.toText(),
+                fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+            )
+                Icon(
+                    painter = painterResource(android.R.drawable.arrow_down_float),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {expanded = false },
+            modifier = Modifier
+                .width(IntrinsicSize.Max)
+                .background(Color(0xFF1A1A1A))
+        ) {
+            TipoOrden.entries.forEach {tipo ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = tipo.toText(),
+                            color = if(tipo == tipoActual) Color(0xFF4CAF50) else Color.White,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    },
+                    onClick = {
+                        onTipoSeleccionado(tipo)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
 @Composable
 private fun LoadingStateListE() {
     Box(
@@ -240,7 +322,9 @@ private fun EquipoCard(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f).padding(end = 8.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
                     )
                     Button(
                         onClick = onVerJugadores,
