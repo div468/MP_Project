@@ -11,6 +11,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.dragonstats.data.local.FavoritosDataStore
 
+enum class TipoOrden {
+    FAVORITOS,
+    NOMBREASCENDENTE,
+    NOMBREDESCENDENTE,
+    PTSASCENDENTE,
+    PTSDESCENDENTE;
+
+    fun toText(): String {
+        return when (this){
+            FAVORITOS -> "Favoritos primero"
+            NOMBREASCENDENTE -> "Nombre: Ascendente de A-Z"
+            NOMBREDESCENDENTE -> "Nombre: Descendente de Z-A"
+            PTSASCENDENTE -> "Puntaje: Menor a mayor"
+            PTSDESCENDENTE -> "Puntaje: Mayor a menor"
+        }
+    }
+}
+
 sealed class EquiposUiState {
     object Loading : EquiposUiState()
     data class Success(val equipo: List<Equipo>) : EquiposUiState()
@@ -28,6 +46,9 @@ class EquiposListadoViewModel(
 
     private val _equiposFavoritos = MutableStateFlow<Set<String>>(emptySet())
     val equiposFavoritos: StateFlow<Set<String>> = _equiposFavoritos.asStateFlow()
+
+    private val _tipoOrden = MutableStateFlow(TipoOrden.FAVORITOS)
+    val tipoOrden: StateFlow<TipoOrden> = _tipoOrden.asStateFlow()
 
     private var equiposOriginal : List<Equipo> = emptyList()
     init {
@@ -64,17 +85,41 @@ class EquiposListadoViewModel(
         }
     }
 
-    //Para reordenar los equipos para favoritos primero y despues ordenar por puntos
+    fun cambiardeOrden(nuevoTipo : TipoOrden){
+        _tipoOrden.value = nuevoTipo
+        reordenarEquipos()
+    }
+
     private fun reordenarEquipos(){
         if (equiposOriginal.isEmpty()){
             return
         }
         val favoritos = _equiposFavoritos.value
-        val equiposOrdenados = equiposOriginal.sortedWith (
-            compareByDescending <Equipo> {favoritos.contains(it.nombre)  }
-                .thenByDescending { it.puntos }
-                .thenByDescending { it.golDiferencia }
-        )
+        val equiposOrdenados = when(_tipoOrden.value){
+            TipoOrden.FAVORITOS -> {
+                equiposOriginal.sortedWith (
+                    compareByDescending <Equipo> {favoritos.contains(it.nombre)  }
+                        .thenByDescending { it.puntos }
+                        .thenByDescending { it.golDiferencia }
+                )
+            }
+            TipoOrden.NOMBREASCENDENTE -> {
+                equiposOriginal.sortedBy { it.nombre}
+            }
+            TipoOrden.NOMBREDESCENDENTE -> {
+                equiposOriginal.sortedBy { it.nombre }.reversed()
+            }
+            TipoOrden.PTSASCENDENTE -> {
+                equiposOriginal.sortedWith (
+                    compareByDescending {it.puntos}
+                )
+            }
+            TipoOrden.PTSDESCENDENTE -> {
+                equiposOriginal.sortedWith(
+                    compareBy {it.puntos}
+                )
+            }
+        }
         _uiState.value = EquiposUiState.Success(equiposOrdenados)
     }
 }
