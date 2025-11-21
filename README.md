@@ -97,7 +97,8 @@ app/
 │               ├── strings.xml                        ← Textos de la aplicación
 │               └── themes.xml                         ← Configuración de temas base
 ```
-
+### Diagrama de Arquitectura
+<img width="3360" height="2221" alt="diagrama de la arquitectura" src="https://github.com/user-attachments/assets/9c11a07c-97bd-43c4-9155-0dca3a963565" />
 ---
 
 ## 🛠️ Tecnologías Utilizadas
